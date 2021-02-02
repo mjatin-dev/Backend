@@ -10,6 +10,7 @@
     }
   },
   "host": "3.131.180.250:8000",
+  "host1": "localhost:8000",
   "basePath": "/api/v1",
   "tags": [
     {
@@ -72,6 +73,29 @@
           }
         }
       }
+    },
+    "/standard_login": {
+      "post": {
+        "description": "User Stand Signup",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User that we want to create",
+            "schema": {
+              "$ref": "#/definitions/standard_login"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Login Successfully"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -115,6 +139,20 @@
       ],
       "properties": {
         "email": {
+          "type": "string"
+        }
+      }
+    },
+    "standard_login": {
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
           "type": "string"
         }
       }

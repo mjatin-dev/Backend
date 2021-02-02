@@ -6,6 +6,14 @@ exports.user_created = (payload) => {
     }
 }
 
+exports.login_success = (payload) => {
+    return {
+        status: 200,
+        message: "Login Successfully",
+        data: payload
+    }
+}
+
 exports.something_wrong = (payload = []) => {
     return {
         status: 400,
@@ -37,4 +45,17 @@ exports.email_unique = () => {
     }
 }
 
+exports.invalid_creds = () => {
+    return {
+        status: 400,
+        message: "Invalid Credentials"
+    }
 
+}
+
+exports.invalid_pass = () => {
+    return {
+        status: 400,
+        message: "Invalid Passwwrd"
+    }
+}

@@ -42,6 +42,27 @@ const check_email = (req, res, next) => {
     });
 }
 
+const standard_login = (req, res, next) => {
+
+    const validationRule = {
+        "email": "required|email",
+        "password": "required"
+    }
+
+    validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: 412,
+                    message: 'Validation failed',
+                    errors: err.errors
+                });
+        } else {
+            next();
+        }
+    });
+}
+
 module.exports = {
-    signup, check_email
+    signup, check_email, standard_login
 }
