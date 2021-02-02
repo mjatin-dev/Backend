@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     your_status: { type: String, default: "" },
     gender: { type: String, require: true },
     images: { type: Array },
+    type: { type: String, default: "standard" },
     create_at: { type: Date, default: Date.now() }
 });
 
