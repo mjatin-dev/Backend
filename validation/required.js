@@ -6,7 +6,7 @@ const signup = (req, res, next) => {
         "email": "required|email",
         "name": "required|string",
         "password": "required",
-        "gender": "requies|string"
+        "gender": "required|string"
     }
 
     validator(req.body, validationRule, {}, (err, status) => {

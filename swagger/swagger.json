@@ -95,6 +95,9 @@
         "password": {
           "type": "string"
         },
+        "gender": {
+          "type": "string"
+        },
         "date_of_birth": {
           "type": "string"
         },
