@@ -1,0 +1,124 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "LoveU APIs",
+    "description": "LoveU APIs",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "APIs",
+      "description": "APIs"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/check_email": {
+      "post": {
+        "description": "Check Email Address",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "body",
+            "description": "Check Email Address",
+            "schema": {
+              "$ref": "#/definitions/check_email"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Check Email Address"
+          }
+        }
+      }
+    },
+    "/standard_signup": {
+      "post": {
+        "description": "User Stand Signup",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User that we want to create",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New user is created"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "required": [
+        "name",
+        "email",
+        "password",
+        "gender",
+        "date_of_birth",
+        "your_status",
+        "about_me"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "date_of_birth": {
+          "type": "string"
+        },
+        "your_status": {
+          "type": "string"
+        },
+        "about_me": {
+          "type": "string"
+        }
+      }
+    },
+    "check_email": {
+      "required": [
+        "email"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "$ref": "#/definitions/User"
+    }
+  }
+}
