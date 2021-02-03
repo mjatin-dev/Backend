@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, require: true },
-    email: { type: String, require: true },
-    password: { type: String, require: true },
+    name: { type: String, default: "" },
+    email: { type: String, default: "" },
+    password: { type: String, default: "" },
     about_me: { type: String, default: "" },
     your_status: { type: String, default: "" },
-    gender: { type: String, require: true },
-    images: { type: Array },
+    gender: { type: String, default: "" },
+    images: { type: Array, default: [] },
     type: { type: String, default: "standard" },
+    social_id: { type: String, default: "" },
+    device_type: { type: String, default: "" },
+    device_token: { type: String, default: "" },
     create_at: { type: Date, default: Date.now() }
 });
 

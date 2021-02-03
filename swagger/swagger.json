@@ -96,6 +96,29 @@
           }
         }
       }
+    },
+    "/social_signup": {
+      "post": {
+        "description": "Social Signup,Case 1:- To check the user already exist or not just send te *Social Id(social_id) if exists you will get status code 400*.Case 2:-If users not exists send all the required params i.e( name, email, password, gender, about_me, your_status, device_type, device_token, social_id)",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Social Signup,Case 1:- To check the user already exist or not just send te *Social Id(social_id) if exists you will get status code 400*.Case 2:-If users not exists send all the required params i.e( name, email, password, gender, about_me, your_status, device_type, device_token, social_id)",
+            "schema": {
+              "$ref": "#/definitions/social_signup"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Login Successfully"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -107,7 +130,9 @@
         "gender",
         "date_of_birth",
         "your_status",
-        "about_me"
+        "about_me",
+        "device_type",
+        "device_token"
       ],
       "properties": {
         "name": {
@@ -129,6 +154,12 @@
           "type": "string"
         },
         "about_me": {
+          "type": "string"
+        },
+        "device_type": {
+          "type": "string"
+        },
+        "device_token": {
           "type": "string"
         }
       }
@@ -153,6 +184,52 @@
           "type": "string"
         },
         "password": {
+          "type": "string"
+        }
+      }
+    },
+    "social_signup": {
+      "required": [
+        "name",
+        "email",
+        "password",
+        "gender",
+        "date_of_birth",
+        "your_status",
+        "about_me",
+        "device_type",
+        "device_token",
+        "social_id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "date_of_birth": {
+          "type": "string"
+        },
+        "your_status": {
+          "type": "string"
+        },
+        "about_me": {
+          "type": "string"
+        },
+        "device_type": {
+          "type": "string"
+        },
+        "device_token": {
+          "type": "string"
+        },
+        "social_id": {
           "type": "string"
         }
       }
