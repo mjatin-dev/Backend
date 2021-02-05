@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
     social_id: { type: String, default: "" },
     device_type: { type: String, default: "" },
     device_token: { type: String, default: "" },
+    location: {
+        type: { type: String, enum: "Point", default: "Point" },
+        coordinates: { type: [Number] }
+    },
     create_at: { type: Date, default: Date.now() }
 });
 

@@ -63,6 +63,27 @@ const standard_login = (req, res, next) => {
     });
 }
 
+const update_location = (req, res, next) => {
+
+    const validationRule = {
+        "latitude": "required",
+        "longitude": "required"
+    }
+
+    validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: 412,
+                    message: 'Validation failed',
+                    errors: err.errors
+                });
+        } else {
+            next();
+        }
+    });
+}
+
 module.exports = {
-    signup, check_email, standard_login
+    signup, check_email, standard_login, update_location
 }

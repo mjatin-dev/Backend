@@ -1,5 +1,8 @@
 const { user } = require("../models/");
+const { sigin } = require("../auth/");
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+const { get } = require("../routes/user");
 
 /**
  * 
@@ -58,10 +61,15 @@ exports.create_standard_user = async (req, res) => {
             });
             let create_user = await new_user_instance.save();
             if (create_user) {
+
+                let checkuser_exists_or_not = await user.find({ _id: create_user._id }).lean().exec();
+                let token = sigin(checkuser_exists_or_not[0]._id);
+                checkuser_exists_or_not[0].token = token;
+
                 res.status(200).json({
                     status: 200,
                     message: "User has been created!",
-                    data: create_user
+                    data: checkuser_exists_or_not
                 })
             }
             else {
@@ -89,8 +97,8 @@ exports.standard_login = async (req, res) => {
     try {
         let { email, password } = req.body;
 
-        let get_detail = await user.find({ email }).exec();;
-        if (get_detail.length > 0) {
+        let get_detail = await user.find({ email: email }).lean().exec();
+        if (get_detail) {
             if (!get_detail || !bcrypt.compareSync(password, get_detail[0].password)) {
                 res.status(400).json({
                     status: 400,
@@ -99,6 +107,9 @@ exports.standard_login = async (req, res) => {
                 })
             }
             else {
+                let token = sigin(get_detail[0]._id);
+                get_detail[0].token = token;
+
                 res.status(200).json({
                     status: 200,
                     message: "Login Successfully",
@@ -129,9 +140,12 @@ exports.standard_login = async (req, res) => {
 exports.social_signup = async (req, res) => {
     try {
         let { name, email, password, gender, about_me, your_status, device_type, device_token, social_id } = req.body
-        let checkuser_exists_or_not = await user.findOne({ social_id: social_id }).exec();
-        console.log(checkuser_exists_or_not)
+        let checkuser_exists_or_not = await user.find({ social_id: social_id }).lean().exec();
+
         if (checkuser_exists_or_not) {
+            let token = sigin(checkuser_exists_or_not[0]._id);
+            checkuser_exists_or_not[0].token = token;
+
             res.status(400).json({ status: 400, message: "User already exists", data: checkuser_exists_or_not })
         }
         else {
@@ -140,11 +154,17 @@ exports.social_signup = async (req, res) => {
                 gender, about_me, your_status, device_type, device_token, social_id
             });
             let create_user = await new_user_instance.save();
+
             if (create_user) {
+
+                let checkuser_exists_or_not = await user.find({ _id: create_user._id }).lean().exec();
+                let token = sigin(checkuser_exists_or_not[0]._id);
+                checkuser_exists_or_not[0].token = token;
+
                 res.status(200).json({
                     status: 200,
                     message: "User has been created!",
-                    data: create_user
+                    data: checkuser_exists_or_not
                 })
             }
             else {
@@ -162,4 +182,30 @@ exports.social_signup = async (req, res) => {
             message: error.message || "Interal server error!!"
         })
     }
-} 
+}
+
+/**
+ * 
+ * @param {latitude, longitude} req 
+ * @param {*} res 
+ */
+exports.update_location = async (req, res) => {
+    let { id } = req.user;
+    let { latitude, longitude } = req.body;
+
+    let location = {
+        type: "Point",
+        coordinates: [latitude, longitude]
+    }
+    console.log(location, mongoose.Types.ObjectId(id));
+
+    let update_location = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { location: location } }).exec();
+    console.log(update_location);
+    if (update_location.n === 1) {
+        let get_user = await user.find({ _id: id }).lean().exec() || [];
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+    }
+    else {
+        res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+    }
+}
