@@ -144,7 +144,7 @@ exports.social_signup = async (req, res) => {
         let { name, email, password, gender, about_me, your_status, device_type, device_token, social_id } = req.body
         let checkuser_exists_or_not = await user.find({ social_id: social_id }).lean().exec();
 
-        if (checkuser_exists_or_not) {
+        if (checkuser_exists_or_not.length > 0) {
             let token = sigin(checkuser_exists_or_not[0]._id);
             checkuser_exists_or_not[0].token = token;
 
@@ -152,7 +152,7 @@ exports.social_signup = async (req, res) => {
         }
         else {
             let new_user_instance = new user({
-                name, email, password: bcrypt.hashSync(password, 10),
+                name, email,
                 gender, about_me, your_status, device_type, device_token, social_id
             });
             let create_user = await new_user_instance.save();
