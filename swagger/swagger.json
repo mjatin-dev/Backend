@@ -133,9 +133,204 @@
           {
             "name": "user",
             "in": "body",
-            
             "schema": {
               "$ref": "#/definitions/update_location"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/update_password": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/update_password"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/update_notification": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token) and send parameter notification on('notification_on')..in this 1 means on 0 means off",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/update_notification"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/update_user": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token).case 1 - If you want to change the radius,interest and age in this send step 1 and their respective paramters.case 2 - If you want to change the name,status and images just send these respective parameter with step 2",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/update_user"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/like_user": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/like_user"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/dislike_user": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/like_user"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/block_user": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/like_user"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successfully"
+          }
+        }
+      }
+    },
+    "/report_user": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/report_user"
             }
           }
         ],
@@ -274,6 +469,91 @@
         },
         "longitude": {
           "type": "number"
+        }
+      }
+    },
+    "update_password": {
+      "required": [
+        "new_password"
+      ],
+      "properties": {
+        "new_password": {
+          "type": "string"
+        }
+      }
+    },
+    "update_notification": {
+      "required": [
+        "notification_on"
+      ],
+      "properties": {
+        "notification_on": {
+          "type": "number"
+        }
+      }
+    },
+    "update_user": {
+      "properties": {
+        "step": {
+          "type": "number"
+        },
+        "age_range": {
+          "typ": "object",
+          "properties": {
+            "max": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            }
+          }
+        },
+        "insterted_in": {
+          "type": "string"
+        },
+        "radius_range": {
+          "typ": "object",
+          "properties": {
+            "max": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            }
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "your_status": {
+          "type": "string"
+        },
+        "images": {
+          "type": "string"
+        }
+      }
+    },
+    "like_user": {
+      "required": [
+        "member_id"
+      ],
+      "properties": {
+        "member_id": {
+          "type": "string"
+        }
+      }
+    },
+    "report_user": {
+      "required": [
+        "reported_by_user_id",
+        "reason"
+      ],
+      "properties": {
+        "reported_by_user_id": {
+          "type": "string"
+        },
+        "reason:": {
+          "type": "string"
         }
       }
     },

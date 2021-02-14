@@ -9,24 +9,29 @@ exports.sigin = (id) => {
 
 exports.verify = async (req, res, next) => {
     let { authorization } = req.headers;
-    if (authorization !== undefined && authorization.startsWith('Bearer ')) {
-        authorization = authorization.slice(7, authorization.length);
-    }
-    if (authorization) {
-        jwt.verify(authorization, process.env.SECRET, (err, result) => {
-            if (err) {
-                return res.status(400).json({ status: 400, message: `Not authorised or user's session has been expired` });
-            }
-            else {
-                req.user = result;
-                next();
-            }
+    if (typeof authorization !== undefined || authorization !== '') {
+        if (authorization !== undefined && authorization.startsWith('Bearer ')) {
+            authorization = authorization.slice(7, authorization.length);
+        }
+        if (authorization) {
+            jwt.verify(authorization, process.env.SECRET, (err, result) => {
+                if (err) {
+                    return res.status(400).json({ status: 400, message: `Not authorised or user's session has been expired` });
+                }
+                else {
+                    req.user = result;
+                    next();
+                }
 
-        });
+            });
 
+        }
+        else {
+            return res.status(400).json({ status: 400, message: `You're not authorised to access this resource` });
+        }
     }
     else {
-        return res.status(400).json({ status: 400, message: `You're not authorised to access this resource` });
+        return res.status(400).json({ status: 400, message: `Authorization is required` });
     }
 }
 

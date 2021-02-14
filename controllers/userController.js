@@ -3,6 +3,7 @@ const { sigin } = require("../auth/");
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { get } = require("../routes/user");
+const moment = require("moment");
 
 /**
  * 
@@ -44,7 +45,7 @@ exports.check_email = async (req, res) => {
  */
 exports.create_standard_user = async (req, res) => {
     try {
-        let { name, email, password, gender, about_me, your_status, device_type, device_token } = req.body;
+        let { name, email, password, gender, date_of_birth, about_me, your_status, device_type, device_token } = req.body;
 
         let get_email = await user.find({ email });
         if (get_email.length > 0) {
@@ -55,9 +56,10 @@ exports.create_standard_user = async (req, res) => {
             })
         }
         else {
+            let find_date = await _calculate_date(`'${date_of_birth}'`);
             let new_user_instance = new user({
                 name, email, password: bcrypt.hashSync(password, 10),
-                gender, about_me, your_status, device_type, device_token
+                gender, date_of_birth: moment(date_of_birth, "MM-DD-YYYY"), age: find_date, about_me, your_status, device_type, device_token
             });
             let create_user = await new_user_instance.save();
             if (create_user) {
@@ -197,7 +199,7 @@ exports.update_location = async (req, res) => {
         type: "Point",
         coordinates: [latitude, longitude]
     }
-    console.log(location, mongoose.Types.ObjectId(id));
+
 
     let update_location = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { location: location } }).exec();
     console.log(update_location);
@@ -208,4 +210,229 @@ exports.update_location = async (req, res) => {
     else {
         res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
     }
+}
+
+/**
+ * 
+ * @param {new_password} req 
+ * @param {*} res 
+ */
+exports.update_password = async (req, res) => {
+    let { id } = req.user;
+    let { new_password: password } = req.body;
+
+    let update_password = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { password: bcrypt.hashSync(password, 10) } }).exec();
+
+    if (update_password.n === 1) {
+        let get_user = await user.find({ _id: id }).lean().exec() || [];
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+    }
+    else {
+        res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+    }
+}
+
+/**
+ * 
+ * @param {new_password} req 
+ * @param {*} res 
+ */
+exports.update_notification = async (req, res) => {
+    let { id } = req.user;
+    let { notification_on } = req.body;
+
+    let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { notification: notification_on } }).exec();
+
+    if (update_notification.n === 1) {
+        let get_user = await user.find({ _id: id }).lean().exec() || [];
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+    }
+    else {
+        res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+    }
+}
+
+
+/**
+ * 
+ * @param {age,radius,interest,steps,image,status} req 
+ * @param {*} res 
+ */
+
+exports.update_user = async (req, res) => {
+    try {
+
+        let { id } = req.user;
+        let { age_range, insterted_in, radius_range, step, name, your_status, images } = req.body;
+
+        let update_payload = step === 1 ? {
+            age_range: age_range ? [{ min: age_range.min, max: age_range.max }] : [],
+            insterted_in: insterted_in || "None",
+            radius_range: radius_range ? [{ min: radius_range.min, max: radius_range.max }] : []
+        } : {
+                name: name ? name : "",
+                images: images ? images : "",
+                your_status: your_status ? your_status : ""
+            };
+
+        let update_user = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: update_payload }).exec();
+
+        if (update_user.n === 1) {
+            let get_user = await user.find({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+        }
+        else {
+            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+        }
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message || "Interal server error!!"
+        })
+    }
+}
+
+/**
+ * 
+ * @param {member_id} req 
+ * @param {*} res 
+ */
+exports.like_user = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { member_id } = req.body;
+
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { liked_members: mongoose.Types.ObjectId(member_id) } }).exec();
+
+        if (update_notification.n === 1) {
+            let get_user = await user.find({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+        }
+        else {
+            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message || "Interal server error!!"
+        })
+    }
+}
+
+/**
+ * 
+ * @param {member_id} req 
+ * @param {*} res 
+ */
+exports.dislike_user = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { member_id } = req.body;
+
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { disliked_members: mongoose.Types.ObjectId(member_id) } }).exec();
+
+        if (update_notification.n === 1) {
+            let get_user = await user.find({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+        }
+        else {
+            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message || "Interal server error!!"
+        })
+    }
+}
+
+
+/**
+ * 
+ * @param {member_id} req 
+ * @param {*} res 
+ */
+exports.block_user = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { member_id } = req.body;
+
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { blocked_users: mongoose.Types.ObjectId(member_id) } }).exec();
+
+        if (update_notification.n === 1) {
+            let get_user = await user.find({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+        }
+        else {
+            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message || "Interal server error!!"
+        })
+    }
+}
+
+/**
+ * 
+ * @param {reported_by,reported_to,reason} req 
+ * @param {*} res 
+ */
+exports.report_user = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { reported_by_user_id, reason } = req.body;
+        let payload = {
+            reported_by_user_id: mongoose.Types.ObjectId(reported_by_user_id), reason
+        }
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { reported_by: payload } }).exec();
+
+        if (update_notification.n === 1) {
+            let get_user = await user.find({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+        }
+        else {
+            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: error.message || "Interal server error!!"
+        })
+    }
+}
+
+
+const _calculate_date = (date) => {
+    return new Promise((resolve, reject) => {
+        try {
+            var dob = new Date(date);
+            //calculate month difference from current date in time  
+            var month_diff = Date.now() - dob.getTime();
+
+            //convert the calculated difference in date format  
+            var age_dt = new Date(month_diff);
+
+            //extract year from date      
+            var year = age_dt.getUTCFullYear();
+
+            //now calculate the age of the user  
+            var age = Math.abs(year - 1970);
+            resolve(age);
+
+        } catch (error) {
+            reject(error)
+        }
+
+    })
+
+
 }

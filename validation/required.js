@@ -84,6 +84,47 @@ const update_location = (req, res, next) => {
     });
 }
 
+const like_user = (req, res, next) => {
+    const validationRule = {
+        "member_id": "required"
+    }
+
+    validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: 412,
+                    message: 'Validation failed',
+                    errors: err.errors
+                });
+        } else {
+            next();
+        }
+    });
+
+}
+
+const report_user = (req, res, next) => {
+    const validationRule = {
+        "reported_by_user_id": "required",
+        "reason": "required"
+    }
+
+    validator(req.body, validationRule, {}, (err, status) => {
+        if (!status) {
+            res.status(412)
+                .send({
+                    status: 412,
+                    message: 'Validation failed',
+                    errors: err.errors
+                });
+        } else {
+            next();
+        }
+    });
+
+}
+
 module.exports = {
-    signup, check_email, standard_login, update_location
+    signup, check_email, standard_login, update_location, like_user, report_user
 }
