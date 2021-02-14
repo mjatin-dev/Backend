@@ -10,43 +10,31 @@ const userSchema = new mongoose.Schema({
     date_of_birth: { type: Date, default: Date.now() },
     age: { type: Number, default: 0 },
     age_range: {
-        type: [{
-            min: { type: Number },
-            max: { type: Number }
-        }],
-        default: []
+        min: { type: Number },
+        max: { type: Number }
     },
-    insterted_in: { type: String, enum: ['Men', 'Women', 'Both','None'], default: "None" },
-    radius_range: { type: Number, default: 0 },
-    liked_members: {
-        type: [{
-            liked_on: { type: Date, default: Date.now() },
-            liked_user_id: { type: mongoose.ObjectId, ref: "users" }
-        }],
-        default: []
+    insterted_in: { type: String, enum: ['Men', 'Women', 'Both', 'None'], default: "None" },
+    radius_range: {
+        min: { type: Number },
+        max: { type: Number }
     },
-    disliked_members: {
-        type: [{
-            disliked_on: { type: Date, default: Date.now() },
-            disliked_user_id: { type: mongoose.ObjectId, ref: "users" }
-        }],
-        default: []
-    },
-    reported_by: {
-        type: [{
-            reported_on: { type: Date, default: Date.now() },
-            reason: { type: String, default: "" },
-            reported_by_user_id: { type: mongoose.ObjectId, ref: "users" }
-        }],
-        default: []
-    },
-    blocked_users: {
-        type: [{
-            blocked_on: { type: Date, default: Date.now() },
-            blocked_by_user_id: { type: mongoose.ObjectId, ref: "users" }
-        }],
-        default: []
-    },
+    liked_members: [{
+        liked_on: { type: Date, default: Date.now() },
+        liked_user_id: { type: mongoose.ObjectId, ref: "users" }
+    }],
+    disliked_members: [{
+        disliked_on: { type: Date, default: Date.now() },
+        disliked_user_id: { type: mongoose.ObjectId, ref: "users" }
+    }],
+    reported_by: [{
+        reported_on: { type: Date, default: Date.now() },
+        reason: { type: String, default: "" },
+        reported_by_user_id: { type: mongoose.ObjectId, ref: "users" }
+    }],
+    blocked_users: [{
+        blocked_on: { type: Date, default: Date.now() },
+        blocked_by_user_id: { type: mongoose.ObjectId, ref: "users" }
+    }],
     images: { type: Array, default: [] },
     type: { type: String, default: "standard" },
     social_id: { type: String, default: "" },

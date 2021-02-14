@@ -528,6 +528,9 @@
         "your_status": {
           "type": "string"
         },
+        "about_me": {
+          "type": "string"
+        },
         "images": {
           "type": "string"
         }

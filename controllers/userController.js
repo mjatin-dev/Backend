@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { get } = require("../routes/user");
 const moment = require("moment");
+const { updateLocale } = require("moment");
 
 /**
  * 
@@ -263,17 +264,24 @@ exports.update_user = async (req, res) => {
     try {
 
         let { id } = req.user;
-        let { age_range, insterted_in, radius_range, step, name, your_status, images } = req.body;
+        let { age_range, insterted_in, radius_range, step, name, your_status, images, about_me } = req.body;
+        let update_payload = {};
+        if (step == 1) {
+            update_payload = {
+                age_range: age_range ? { min: age_range.min, max: age_range.max } : { min: 0, max: 0 },
+                insterted_in: insterted_in || "None",
+                radius_range: radius_range ? { min: radius_range.min, max: radius_range.max } : { min: 0, max: 0 }
+            }
+        }
+        else {
+            for (const key in req.body) {
+                console.log(key)
+                update_payload[key] = req.body[key]
+            }
 
-        let update_payload = step === 1 ? {
-            age_range: age_range ? [{ min: age_range.min, max: age_range.max }] : [],
-            insterted_in: insterted_in || "None",
-            radius_range: radius_range ? [{ min: radius_range.min, max: radius_range.max }] : []
-        } : {
-                name: name ? name : "",
-                images: images ? images : "",
-                your_status: your_status ? your_status : ""
-            };
+        }
+
+        console.log(update_payload);
 
         let update_user = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: update_payload }).exec();
 
