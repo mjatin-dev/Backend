@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema({
         blocked_by_user_id: { type: mongoose.ObjectId, ref: "users" }
     }],
     images: { type: Array, default: [] },
+    profile_image: { type: String, default: "" },
     type: { type: String, default: "standard" },
     social_id: { type: String, default: "" },
     device_type: { type: String, default: "" },

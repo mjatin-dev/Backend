@@ -60,7 +60,8 @@ exports.create_standard_user = async (req, res) => {
             let find_date = await _calculate_date(`'${date_of_birth}'`);
             let new_user_instance = new user({
                 name, email, password: bcrypt.hashSync(password, 10),
-                gender, date_of_birth: moment(date_of_birth, "MM-DD-YYYY"), age: find_date, about_me, your_status, device_type, device_token
+                gender, date_of_birth: moment(date_of_birth, "MM-DD-YYYY"), age: find_date, about_me, your_status, device_type, device_token,
+                type: "standard"
             });
             let create_user = await new_user_instance.save();
             if (create_user) {
@@ -100,7 +101,7 @@ exports.standard_login = async (req, res) => {
     try {
         let { email, password } = req.body;
 
-        let get_detail = await user.find({ email: email }).lean().exec();
+        let get_detail = await user.find({ email: email, type: "standard" }).lean().exec();
         if (get_detail) {
             if (!get_detail || !bcrypt.compareSync(password, get_detail[0].password)) {
                 res.status(400).json({
@@ -154,7 +155,8 @@ exports.social_signup = async (req, res) => {
         else {
             let new_user_instance = new user({
                 name, email,
-                gender, about_me, your_status, device_type, device_token, social_id
+                gender, about_me, your_status, device_type, device_token, social_id,
+                type: "social"
             });
             let create_user = await new_user_instance.save();
 
