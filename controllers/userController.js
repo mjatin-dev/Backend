@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { get } = require("../routes/user");
 const moment = require("moment");
 const { updateLocale } = require("moment");
+const admin = require("../models/admin");
 
 /**
  * 
@@ -245,8 +246,8 @@ exports.update_notification = async (req, res) => {
     let { notification_on } = req.body;
 
     let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { notification_on: notification_on } }).exec();
-console.log(update_notification)
-    if (update_notification.n === 1) { 
+    console.log(update_notification)
+    if (update_notification.n === 1) {
         let get_user = await user.find({ _id: id }).lean().exec() || [];
         res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
     }
@@ -420,6 +421,20 @@ exports.report_user = async (req, res) => {
     }
 }
 
+exports.get_questions = async (req, res) => {
+    try {
+        let list_questions = await admin.find({}).lean().exec() || [];
+        if (list_questions.length > 0) {
+            res.status(200).json({ status: 200, message: "Questions List", data: list_questions[0].question_list });
+        }
+        else {
+            res.status(400).json({ status: 400, message: "No list found", data: [] });
+        }
+
+    } catch (error) {
+        res.status(500).json({ status: 500, message: error.message || "Something went wrong" });
+    }
+}
 
 const _calculate_date = (date) => {
     console.log(date)
