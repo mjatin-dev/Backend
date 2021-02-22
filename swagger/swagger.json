@@ -533,6 +533,9 @@
         },
         "images": {
           "type": "string"
+        },
+        "profile_image":{
+          "type":"string"
         }
       }
     },

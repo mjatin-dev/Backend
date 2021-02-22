@@ -244,9 +244,9 @@ exports.update_notification = async (req, res) => {
     let { id } = req.user;
     let { notification_on } = req.body;
 
-    let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { notification: notification_on } }).exec();
-
-    if (update_notification.n === 1) {
+    let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { notification_on: notification_on } }).exec();
+console.log(update_notification)
+    if (update_notification.n === 1) { 
         let get_user = await user.find({ _id: id }).lean().exec() || [];
         res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
     }
@@ -422,9 +422,11 @@ exports.report_user = async (req, res) => {
 
 
 const _calculate_date = (date) => {
+    console.log(date)
     return new Promise((resolve, reject) => {
         try {
             var dob = new Date(date);
+            console.log(dob)
             //calculate month difference from current date in time  
             var month_diff = Date.now() - dob.getTime();
 
@@ -436,6 +438,7 @@ const _calculate_date = (date) => {
 
             //now calculate the age of the user  
             var age = Math.abs(year - 1970);
+            console.log(age)
             resolve(age);
 
         } catch (error) {

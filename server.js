@@ -12,9 +12,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-app.use(cors()); 
+app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use('/*', express.static(`${__dirname}/${build}`));
 
 app.use(function (req, res, next) {
     console.log(req.method, req.path, "-", req.ip);
@@ -23,8 +24,9 @@ app.use(function (req, res, next) {
 
 app.set('view engine', 'ejs');
 
-const { user } = require('./routes');
+const { user, admin } = require('./routes');
 app.use('/api/v1/', user);
+app.use('/admin', admin);
 
 // Connecting to the database
 mongoose.connect(process.env.DB_URL, {
