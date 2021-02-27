@@ -364,6 +364,27 @@
           }
         }
       }
+    },
+    "/user_list": {
+      "get": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "user list"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -555,8 +576,8 @@
         "images": {
           "type": "string"
         },
-        "profile_image":{
-          "type":"string"
+        "profile_image": {
+          "type": "string"
         }
       }
     },
