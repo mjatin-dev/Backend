@@ -18,19 +18,22 @@ exports.check_email = async (req, res) => {
         let { email } = req.body;
         let get_email = await user.find({ email });
         if (get_email.length > 0) {
-            res.status(201).json({
+            res.status(200).json({
+                status:200,
                 message: "Email already exists!"
 
             })
         }
         else {
-            res.status(201).json({
+            res.status(200).json({
+                status:200,
                 message: "Email address is unqiue!"
 
             })
         }
     } catch (error) {
         res.status(500).json({
+            status:500,
             message: "Something went wrong!!"
 
         })
@@ -48,7 +51,8 @@ exports.create_standard_user = async (req, res) => {
 
         let get_email = await user.find({ email });
         if (get_email.length > 0) {
-            res.status(201).json({
+            res.status(200).json({
+                status:200,
                 message: "Email already exists!"
 
             })
@@ -68,12 +72,14 @@ exports.create_standard_user = async (req, res) => {
                 checkuser_exists_or_not[0].token = token;
 
                 res.status(200).json({
+                    status:200,
                     message: "User has been created!",
                     data: checkuser_exists_or_not
                 })
             }
             else {
                 res.status(201).json({
+                    status:200,
                     message: "Something went wrong!"
 
                 })
@@ -81,6 +87,7 @@ exports.create_standard_user = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
+            status:500,
             message: error.message || "Interal server error!"
         })
     }
@@ -99,7 +106,8 @@ exports.standard_login = async (req, res) => {
         console.log(get_detail)
         if (get_detail) {
             if (!get_detail || !bcrypt.compareSync(password, get_detail[0].password)) {
-                res.status(201).json({
+                res.status(200).json({
+                    status:200,
                     message: "Invalid credentials!!"
 
                 })
@@ -109,6 +117,7 @@ exports.standard_login = async (req, res) => {
                 get_detail[0].token = token;
 
                 res.status(200).json({
+                    status:200,
                     message: "Login Successfully",
                     data: get_detail
                 })
@@ -116,12 +125,14 @@ exports.standard_login = async (req, res) => {
         }
         else {
             res.status(201).json({
+                status:201,
                 message: "Invalid credentials!!"
 
             })
         }
     } catch (error) {
         res.status(500).json({
+            status:500,
             message: error.message || "Interal server error!!"
         })
     }
@@ -131,6 +142,7 @@ exports.standard_login = async (req, res) => {
  * 
  * @param {email, password} req 
  * @param {*} res 
+ * 
  */
 exports.social_signup = async (req, res) => {
     try {
@@ -141,7 +153,7 @@ exports.social_signup = async (req, res) => {
             let token = sigin(checkuser_exists_or_not[0]._id);
             checkuser_exists_or_not[0].token = token;
 
-            res.status(201).json({ message: "User already exists", data: checkuser_exists_or_not })
+            res.status(200).json({ status: 200, message: "User already exists", data: checkuser_exists_or_not })
         }
         else {
             let new_user_instance = new user({
@@ -158,12 +170,14 @@ exports.social_signup = async (req, res) => {
                 checkuser_exists_or_not[0].token = token;
 
                 res.status(200).json({
+                    status: 200,
                     message: "User has been created!",
                     data: checkuser_exists_or_not
                 })
             }
             else {
                 res.status(500).json({
+                    status: 500,
                     message: "Something went wrong!"
 
                 })
@@ -172,6 +186,7 @@ exports.social_signup = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
+            status:500,
             message: error.message || "Interal server error!!"
         })
     }
@@ -196,10 +211,10 @@ exports.update_location = async (req, res) => {
     console.log(update_location);
     if (update_location.n === 1) {
         let get_user = await user.find({ _id: id }).lean().exec() || [];
-        res.status(200).json({ message: "Update successfully", data: get_user });
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
     }
     else {
-        res.status(201).json({ message: "Something went wrong", data: [] });
+        res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
     }
 }
 
@@ -216,10 +231,10 @@ exports.update_password = async (req, res) => {
 
     if (update_password.n === 1) {
         let get_user = await user.find({ _id: id }).lean().exec() || [];
-        res.status(200).json({ message: "Update successfully", data: get_user });
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
     }
     else {
-        res.status(201).json({ message: "Something went wrong", data: [] });
+        res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
     }
 }
 
@@ -236,10 +251,10 @@ exports.update_notification = async (req, res) => {
     console.log(update_notification)
     if (update_notification.n === 1) {
         let get_user = await user.find({ _id: id }).lean().exec() || [];
-        res.status(200).json({ message: "Update successfully", data: get_user });
+        res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
     }
     else {
-        res.status(201).json({ message: "Something went wrong", data: [] });
+        res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
     }
 }
 
@@ -277,10 +292,10 @@ exports.update_user = async (req, res) => {
 
         if (update_user.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
         }
         else {
-            res.status(201).json({ message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
         }
 
 
@@ -306,10 +321,10 @@ exports.like_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
         }
         else {
-            res.status(201).json({ message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
         }
 
     } catch (error) {
@@ -334,10 +349,10 @@ exports.dislike_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
         }
         else {
-            res.status(201).json({ message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
         }
 
     } catch (error) {
@@ -362,10 +377,10 @@ exports.block_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
         }
         else {
-            res.status(201).json({ message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
         }
 
     } catch (error) {
@@ -391,10 +406,10 @@ exports.report_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
         }
         else {
-            res.status(201).json({ message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
         }
 
     } catch (error) {
@@ -408,14 +423,14 @@ exports.get_questions = async (req, res) => {
     try {
         let list_questions = await admin.find({}).lean().exec() || [];
         if (list_questions.length > 0) {
-            res.status(200).json({ message: "Questions List", data: list_questions[0].question_list });
+            res.status(200).json({ status: 200, message: "Questions List", data: list_questions[0].question_list });
         }
         else {
-            res.status(201).json({ message: "No list found", data: [] });
+            res.status(201).json({ status: 201, message: "No list found", data: [] });
         }
 
     } catch (error) {
-        res.status(500).json({ message: error.message || "Something went wrong" });
+        res.status(500).json({ status: 500, message: error.message || "Something went wrong" });
     }
 }
 
@@ -430,14 +445,14 @@ exports.user_list = async (req, res) => {
 
         let user_list = await user.find({}) || [];
         if (user_list.length > 0) {
-            res.status(200).json({ message: "Users List", data: user_list });
+            res.status(200).json({ status: 200, message: "Users List", data: user_list });
         }
         else {
-            res.status(201).json({ message: "Users List", data: user_list });
+            res.status(201).json({ status: 201, message: "Users List", data: user_list });
         }
 
     } catch (error) {
-        res.status(500).json({ message: error.message || "Internal server error!!" });
+        res.status(500).json({ status: 500, message: error.message || "Internal server error!!" });
     }
 }
 
