@@ -6,6 +6,6 @@ const { admin } = require('../controllers');
 
 router.post("/login", admin.login);
 router.post("/signup", admin.signup);
-router.post("/add-questions", verify, admin.addquestion)
+router.post("/add-questions", admin.addquestion)
 
 module.exports = router;

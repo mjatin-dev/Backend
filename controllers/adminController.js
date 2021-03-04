@@ -11,8 +11,10 @@ const bcrypt = require('bcryptjs');
 exports.login = async (req, res) => {
     try {
         let { email, password } = req.body;
+        console.log(req.body)
         let admin_detail = await admin.find({ email }).lean();
         if (admin_detail.length > 0) {
+            console.log(admin_detail)
             if (!bcrypt.compareSync(password, admin_detail[0].password)) {
                 res.status(201).json({
                     status: 201,
@@ -37,6 +39,7 @@ exports.login = async (req, res) => {
             })
         }
     } catch (error) {
+        console.log('err', error)
         res.status(500).json({
             status: 500,
             message: "Something went wrong!!"
@@ -115,7 +118,7 @@ exports.addquestion = async (req, res) => {
             res.status(200).json({ status: 200, message: "Update successfully", data: get_data });
         }
         else {
-            res.status(200).json({ status: 400, message: "Something went wrong", data: [] });
+            res.status(400).json({ status: 400, message: "Something went wrong", data: [] });
         }
 
     } catch (error) {
