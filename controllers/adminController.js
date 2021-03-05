@@ -107,12 +107,12 @@ exports.signup = async (req, res) => {
 exports.addquestion = async (req, res) => {
     try {
         let { question, option_list } = req.body;
-        // let { id } = req.user;
+        let id = '6033a17ce735a87de5e3598b';
         let question_list = {
             question,
             options: option_list
         }
-        let update = await admin.updateOne({ _id: mongoose.Types.ObjectId('6033a17ce735a87de5e3598b') }, { $push: { question_list } });
+        let update = await admin.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $push: { question_list } });
         if (update.n === 1) {
             let get_data = await admin.find({ _id: mongoose.Types.ObjectId(id) }).lean().exec() || [];
             res.status(200).json({ status: 200, message: "Update successfully", data: get_data });
