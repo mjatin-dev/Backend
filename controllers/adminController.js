@@ -1,4 +1,4 @@
-const { admin, question } = require("../models/");
+const { admin, question, user } = require("../models/");
 const { sigin } = require("../auth/");
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
@@ -126,5 +126,23 @@ exports.addquestion = async (req, res) => {
             status: 500,
             message: error.message || "Interal server error!"
         })
+    }
+}
+
+/**
+ * @param {} req 
+ * @param {*} res 
+*/
+exports.getUsers = async (req, res) => {
+    try {
+        let userList = await user.find({}) || [];
+        if (userList.length > 0) {
+            res.status(200).json({ message: "user list", status: 200, data: userList })
+        }
+        else {
+            res.status(201).json({ message: "no user found", status: 201, data: userList })
+        }
+    } catch (error) {
+        res.status(500).json({ status: 500, message: error.message || "Internal server error" });
     }
 }
