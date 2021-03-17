@@ -107,11 +107,13 @@ exports.signup = async (req, res) => {
 exports.addquestion = async (req, res) => {
     try {
         let { question, option_list } = req.body;
-        let id = '6033a17ce735a87de5e3598b';
+        let { id } = req.user;
+        // let id = '6033a17ce735a87de5e3598b';
         let question_list = {
             question,
             options: option_list
         }
+        console.log(id)
         let update = await admin.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $push: { question_list } });
         if (update.n === 1) {
             let get_data = await admin.find({ _id: mongoose.Types.ObjectId(id) }).lean().exec() || [];
@@ -142,6 +144,26 @@ exports.getUsers = async (req, res) => {
         else {
             res.status(201).json({ message: "no user found", status: 201, data: userList })
         }
+    } catch (error) {
+        res.status(500).json({ status: 500, message: error.message || "Internal server error" });
+    }
+}
+
+/**
+ * @param {} req 
+ * @param {*} res 
+*/
+exports.getQuestion = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let questionList = await admin.find({ _id: mongoose.Types.ObjectId(id) }, { question_list: 1 }) || [];
+        if (questionList.length > 0) {
+            res.status(200).json({ message: "user list", status: 200, data: questionList })
+        }
+        else {
+            res.status(201).json({ message: "no user found", status: 201, data: questionList })
+        }
+
     } catch (error) {
         res.status(500).json({ status: 500, message: error.message || "Internal server error" });
     }
