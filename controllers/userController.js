@@ -19,21 +19,21 @@ exports.check_email = async (req, res) => {
         let get_email = await user.find({ email });
         if (get_email.length > 0) {
             res.status(200).json({
-                status:200,
+                status: 200,
                 message: "Email already exists!"
 
             })
         }
         else {
             res.status(200).json({
-                status:200,
+                status: 200,
                 message: "Email address is unqiue!"
 
             })
         }
     } catch (error) {
         res.status(500).json({
-            status:500,
+            status: 500,
             message: "Something went wrong!!"
 
         })
@@ -52,7 +52,7 @@ exports.create_standard_user = async (req, res) => {
         let get_email = await user.find({ email });
         if (get_email.length > 0) {
             res.status(200).json({
-                status:200,
+                status: 200,
                 message: "Email already exists!"
 
             })
@@ -72,14 +72,14 @@ exports.create_standard_user = async (req, res) => {
                 checkuser_exists_or_not[0].token = token;
 
                 res.status(200).json({
-                    status:200,
+                    status: 200,
                     message: "User has been created!",
                     data: checkuser_exists_or_not
                 })
             }
             else {
                 res.status(201).json({
-                    status:200,
+                    status: 200,
                     message: "Something went wrong!"
 
                 })
@@ -87,7 +87,7 @@ exports.create_standard_user = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            status:500,
+            status: 500,
             message: error.message || "Interal server error!"
         })
     }
@@ -102,12 +102,12 @@ exports.standard_login = async (req, res) => {
     try {
         let { email, password } = req.body;
 
-        let get_detail = await user.find({ email: email, type: "standard" }).lean().exec();
+        let get_detail = await user.find({ email: email, type: "standard" }).lean().exec() || [];
         console.log(get_detail)
-        if (get_detail) {
+        if (get_detail.length > 0) {
             if (!get_detail || !bcrypt.compareSync(password, get_detail[0].password)) {
                 res.status(200).json({
-                    status:200,
+                    status: 200,
                     message: "Invalid credentials!!"
 
                 })
@@ -117,7 +117,7 @@ exports.standard_login = async (req, res) => {
                 get_detail[0].token = token;
 
                 res.status(200).json({
-                    status:200,
+                    status: 200,
                     message: "Login Successfully",
                     data: get_detail
                 })
@@ -125,14 +125,14 @@ exports.standard_login = async (req, res) => {
         }
         else {
             res.status(201).json({
-                status:201,
+                status: 201,
                 message: "Invalid credentials!!"
 
             })
         }
     } catch (error) {
         res.status(500).json({
-            status:500,
+            status: 500,
             message: error.message || "Interal server error!!"
         })
     }
@@ -186,7 +186,7 @@ exports.social_signup = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
-            status:500,
+            status: 500,
             message: error.message || "Interal server error!!"
         })
     }
@@ -317,7 +317,7 @@ exports.like_user = async (req, res) => {
         let { id } = req.user;
         let { member_id } = req.body;
 
-        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { liked_members: mongoose.Types.ObjectId(member_id) } }).exec();
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $push: { liked_members: { liked_user_id: mongoose.Types.ObjectId(member_id) } } }).exec();
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
@@ -345,7 +345,7 @@ exports.dislike_user = async (req, res) => {
         let { id } = req.user;
         let { member_id } = req.body;
 
-        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { disliked_members: mongoose.Types.ObjectId(member_id) } }).exec();
+        let update_notification = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $push: { disliked_members: { disliked_user_id: mongoose.Types.ObjectId(member_id) } } }).exec();
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
@@ -443,7 +443,21 @@ exports.get_questions = async (req, res) => {
 exports.user_list = async (req, res) => {
     try {
 
-        let user_list = await user.find({}) || [];
+        let { id } = req.user;
+        let user_detail = await user.findOne({ _id: mongoose.Types.ObjectId(id) }).lean().exec();
+
+        let { liked_members, disliked_members } = user_detail;
+        liked_members = liked_members > 0 ? liked_members.map(data => data.liked_user_id) : [];
+        disliked_members = disliked_members ? disliked_members.map(data => data.disliked_user_id) : [];
+
+        let condition = {
+            $and: [
+                { _id: { $nin: liked_members } },
+                { _id: { $ne: mongoose.Types.ObjectId(id) } },
+                { _id: { $nin: disliked_members } }
+            ]
+        }
+        let user_list = await user.find(condition) || [];
         if (user_list.length > 0) {
             res.status(200).json({ status: 200, message: "Users List", data: user_list });
         }
@@ -452,6 +466,7 @@ exports.user_list = async (req, res) => {
         }
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({ status: 500, message: error.message || "Internal server error!!" });
     }
 }
