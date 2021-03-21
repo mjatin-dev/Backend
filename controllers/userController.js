@@ -447,9 +447,9 @@ exports.user_list = async (req, res) => {
         let user_detail = await user.findOne({ _id: mongoose.Types.ObjectId(id) }).lean().exec();
 
         let { liked_members, disliked_members } = user_detail;
-        liked_members = liked_members > 0 ? liked_members.map(data => data.liked_user_id) : [];
+        liked_members = liked_members  ? liked_members.map(data => data.liked_user_id) : [];
         disliked_members = disliked_members ? disliked_members.map(data => data.disliked_user_id) : [];
-
+        console.log(liked_members, disliked_members)
         let condition = {
             $and: [
                 { _id: { $nin: liked_members } },
@@ -457,6 +457,7 @@ exports.user_list = async (req, res) => {
                 { _id: { $nin: disliked_members } }
             ]
         }
+        console.log(condition);
         let user_list = await user.find(condition) || [];
         if (user_list.length > 0) {
             res.status(200).json({ status: 200, message: "Users List", data: user_list });
