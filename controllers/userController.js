@@ -6,6 +6,7 @@ const { get } = require("../routes/user");
 const moment = require("moment");
 const { updateLocale } = require("moment");
 const admin = require("../models/admin");
+const { helpers, notifications } = require("../utilities/");
 
 /**
  * 
@@ -58,7 +59,7 @@ exports.create_standard_user = async (req, res) => {
             })
         }
         else {
-            let find_date = await _calculate_date(`'${date_of_birth}'`);
+            let find_date = await helpers._calculate_date(`'${date_of_birth}'`);
             let new_user_instance = new user({
                 name, email, password: bcrypt.hashSync(password, 10),
                 gender, date_of_birth: moment(date_of_birth, "MM-DD-YYYY"), age: find_date, about_me, your_status, device_type, device_token,
@@ -321,7 +322,7 @@ exports.like_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully"});
         }
         else {
             res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
@@ -349,10 +350,10 @@ exports.dislike_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully" });
         }
         else {
-            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong" });
         }
 
     } catch (error) {
@@ -377,10 +378,10 @@ exports.block_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully" });
         }
         else {
-            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong"});
         }
 
     } catch (error) {
@@ -406,10 +407,10 @@ exports.report_user = async (req, res) => {
 
         if (update_notification.n === 1) {
             let get_user = await user.find({ _id: id }).lean().exec() || [];
-            res.status(200).json({ status: 200, message: "Update successfully", data: get_user });
+            res.status(200).json({ status: 200, message: "Update successfully" });
         }
         else {
-            res.status(201).json({ status: 201, message: "Something went wrong", data: [] });
+            res.status(201).json({ status: 201, message: "Something went wrong" });
         }
 
     } catch (error) {
@@ -442,14 +443,13 @@ exports.get_questions = async (req, res) => {
 
 exports.user_list = async (req, res) => {
     try {
-
         let { id } = req.user;
         let user_detail = await user.findOne({ _id: mongoose.Types.ObjectId(id) }).lean().exec();
 
         let { liked_members, disliked_members } = user_detail;
-        liked_members = liked_members  ? liked_members.map(data => data.liked_user_id) : [];
+        liked_members = liked_members ? liked_members.map(data => data.liked_user_id) : [];
         disliked_members = disliked_members ? disliked_members.map(data => data.disliked_user_id) : [];
-        console.log(liked_members, disliked_members)
+
         let condition = {
             $and: [
                 { _id: { $nin: liked_members } },
@@ -457,7 +457,6 @@ exports.user_list = async (req, res) => {
                 { _id: { $nin: disliked_members } }
             ]
         }
-        console.log(condition);
         let user_list = await user.find(condition) || [];
         if (user_list.length > 0) {
             res.status(200).json({ status: 200, message: "Users List", data: user_list });
@@ -472,31 +471,37 @@ exports.user_list = async (req, res) => {
     }
 }
 
-const _calculate_date = (date) => {
-    console.log(date)
-    return new Promise((resolve, reject) => {
-        try {
-            var dob = new Date(date);
-            console.log(dob)
-            //calculate month difference from current date in time  
-            var month_diff = Date.now() - dob.getTime();
 
-            //convert the calculated difference in date format  
-            var age_dt = new Date(month_diff);
+/**
+ * 
+ * @param { req 
+ * @param {*} res 
+ */
+exports.user_answers = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { answer_list } = req.body;
 
-            //extract year from date      
-            var year = age_dt.getUTCFullYear();
+        let count_result = await helpers._count(answer_list.split(","));
+        let sort_result = count_result.sort((a, b) => (a.count < b.count) ? 1 : ((b.count < a.count) ? -1 : 0));
+        let top_four_result = sort_result.slice(0, 4).map(data => data.value).join("");
 
-            //now calculate the age of the user  
-            var age = Math.abs(year - 1970);
-            console.log(age)
-            resolve(age);
+        let update_love_type = await user.updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: { love_type: top_four_result } }).exec();
+        if (update_love_type.n === 1) {
 
-        } catch (error) {
-            reject(error)
+            let { love_type } = await user.findOne({ _id: id }).lean().exec() || [];
+            res.status(200).json({ status: 200, message: "Update successfully", data: love_type });
+        }
+        else {
+            res.status(201).json({ status: 201, message: "Updation failed", data: "" });
         }
 
-    })
+    } catch (error) {
+        res.status(500).json({ status: 500, message: error.message || "Something went wrong" });
+    }
 
+}
 
+exports.send_notification = async (req, res) => {
+    console.log(await notifications.sendAndroid())
 }

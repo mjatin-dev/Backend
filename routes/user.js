@@ -18,6 +18,8 @@ router.post("/dislike_user", verify, validate.like_user, user.dislike_user);
 router.post("/block_user", verify, validate.like_user, user.block_user);
 router.post("/report_user", verify, validate.report_user, user.report_user);
 router.get("/get_questions", verify, user.get_questions);
-router.get("/user_list", verify, user.user_list)
+router.get("/user_list", verify, user.user_list);
+router.post("/user_answers",verify, user.user_answers);
+router.get("/send_notification",user.send_notification);
 
 module.exports = router;

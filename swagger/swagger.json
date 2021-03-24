@@ -9,8 +9,8 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "host": "3.142.32.45:8000",
-  "host1": "localhost:8000",
+  "host1": "3.142.32.45:8000",
+  "host": "localhost:8000",
   "basePath": "/api/v1",
   "tags": [
     {
@@ -385,6 +385,34 @@
           }
         }
       }
+    },
+    "/user_answers": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token),Sent answer list as array."
+          },
+          {
+            "name": "answer_list",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/user_answers"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "user type"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -601,6 +629,16 @@
           "type": "string"
         },
         "reason:": {
+          "type": "string"
+        }
+      }
+    },
+    "user_answers": {
+      "required": [
+        "answer_list"
+      ],
+      "properties": {
+        "answer_list": {
           "type": "string"
         }
       }

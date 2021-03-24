@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
         type: { type: String, enum: "Point", default: "Point" },
         coordinates: { type: [Number] }
     },
+    love_type: { type: String, default: "" },
     notification_on: { type: Number, default: 1 },
     create_at: { type: Date, default: Date.now() }
 });
