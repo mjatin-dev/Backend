@@ -9,8 +9,8 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "host1": "3.142.32.45:8000",
-  "host": "localhost:8000",
+  "host": "3.142.32.45:8000",
+  "host1": "localhost:8000",
   "basePath": "/api/v1",
   "tags": [
     {
@@ -18,15 +18,9 @@
       "description": "APIs"
     }
   ],
-  "schemes": [
-    "http"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
   "paths": {
     "/check_email": {
       "post": {
@@ -41,9 +35,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Check Email Address"
@@ -64,9 +56,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "New user is created"
@@ -87,9 +77,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Login Successfully"
@@ -110,9 +98,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Login Successfully"
@@ -138,9 +124,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -166,9 +150,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -194,9 +176,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -222,9 +202,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -250,9 +228,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -278,9 +254,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -306,9 +280,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -334,9 +306,7 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Update Successfully"
@@ -355,9 +325,7 @@
             "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "question list"
@@ -376,9 +344,7 @@
             "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
           }
         ],
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "user list"
@@ -404,9 +370,27 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "user type"
+          }
+        }
+      }
+    },
+    "/user_detail": {
+      "get": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "schema": {
+              "$ref": "#/definitions/user_detail"
+            }
+          }
         ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "user type"
@@ -459,9 +443,7 @@
       }
     },
     "check_email": {
-      "required": [
-        "email"
-      ],
+      "required": ["email"],
       "properties": {
         "email": {
           "type": "string"
@@ -469,10 +451,7 @@
       }
     },
     "standard_login": {
-      "required": [
-        "email",
-        "password"
-      ],
+      "required": ["email", "password"],
       "properties": {
         "email": {
           "type": "string"
@@ -529,10 +508,7 @@
       }
     },
     "update_location": {
-      "required": [
-        "latitude",
-        "longitude"
-      ],
+      "required": ["latitude", "longitude"],
       "properties": {
         "latitude": {
           "type": "number"
@@ -543,9 +519,7 @@
       }
     },
     "update_password": {
-      "required": [
-        "new_password"
-      ],
+      "required": ["new_password"],
       "properties": {
         "new_password": {
           "type": "string"
@@ -553,9 +527,7 @@
       }
     },
     "update_notification": {
-      "required": [
-        "notification_on"
-      ],
+      "required": ["notification_on"],
       "properties": {
         "notification_on": {
           "type": "number"
@@ -610,9 +582,7 @@
       }
     },
     "like_user": {
-      "required": [
-        "member_id"
-      ],
+      "required": ["member_id"],
       "properties": {
         "member_id": {
           "type": "string"
@@ -620,10 +590,7 @@
       }
     },
     "report_user": {
-      "required": [
-        "reported_by_user_id",
-        "reason"
-      ],
+      "required": ["reported_by_user_id", "reason"],
       "properties": {
         "reported_by_user_id": {
           "type": "string"
@@ -634,11 +601,17 @@
       }
     },
     "user_answers": {
-      "required": [
-        "answer_list"
-      ],
+      "required": ["answer_list"],
       "properties": {
         "answer_list": {
+          "type": "string"
+        }
+      }
+    },
+    "user_detail": {
+      "required": ["user_id"],
+      "properties": {
+        "user_id": {
           "type": "string"
         }
       }

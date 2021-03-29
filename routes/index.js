@@ -1,2 +1,2 @@
-exports.user = require('./user');
-exports.admin = require('./admin');
+exports.user = require("./user");
+exports.admin = require("./admin");
