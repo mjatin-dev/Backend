@@ -177,7 +177,7 @@ exports.social_signup = async (req, res) => {
       checkuser_exists_or_not[0].token = token;
 
       res.status(200).json({
-        status: 200,
+        status: 400,
         message: "User already exists",
         data: checkuser_exists_or_not,
       });
