@@ -390,6 +390,8 @@ exports.likeUser = async (req, res) => {
         .lean()
         .exec()) | [];
 
+    console.log(checkIsAlreadyLikeUser);
+
     if (checkIsAlreadyLikeUser > 0) {
       let getUser =
         (await user
@@ -404,6 +406,7 @@ exports.likeUser = async (req, res) => {
       });
     }
 
+    console.log(deviceTokensAndType);
     let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
@@ -740,6 +743,7 @@ exports.setNotification = async (
         ) {
           sendNotification(message, title, deviceToken, deviceTokenIndex)
             .then((isSend) => {
+              console.log(isSend);
               saveNotification(message, title, deviceToken, deviceTokenIndex)
                 .then((isSave) => {
                   console.log(isSave);
