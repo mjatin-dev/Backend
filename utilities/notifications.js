@@ -23,6 +23,7 @@ exports.sendAndroid = (text = "", title = "", token) => {
           reject(error);
         });
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });

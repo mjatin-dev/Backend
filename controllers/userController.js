@@ -118,7 +118,7 @@ exports.standardLogin = async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    let get_detail =
+    let getDetail =
       (await user.find({ email: email, type: "standard" }).lean().exec()) || [];
     if (getDetail.length > 0) {
       if (!getDetail || !bcrypt.compareSync(password, getDetail[0].password)) {
@@ -391,7 +391,7 @@ exports.likeUser = async (req, res) => {
         .lean()
         .exec()) | [];
 
-    console.log(checkIsAlreadyLikeUser);
+    console.log("user_id", checkIsAlreadyLikeUser);
 
     if (checkIsAlreadyLikeUser > 0) {
       let getUser =
@@ -420,21 +420,26 @@ exports.likeUser = async (req, res) => {
         }
       )
       .exec();
+    console.log(updateNotification);
 
     if (updateNotification.n === 1) {
       let getUser = (await user.find({ _id: id }).lean().exec()) || [];
-      deviceTokensandType.push({
+      deviceTokensAndType.push({
         id: getUser[0]._id,
         token: getUser[0].device_token,
         type: getUser[0].device_type,
         notificationType: globalConstants.constant.matchNotificationTypeName,
       });
-      let { userMatchMessage, userMatchTitle } = notificationText.messages;
-      await setNotification(
-        userMatchMessage,
-        userMatchTitle,
-        deviceTokensAndType
-      );
+
+      if (deviceTokensAndType.length > 0) {
+        let { userMatchMessage, userMatchTitle } = notificationText.messages;
+        await setNotification(
+          userMatchMessage,
+          userMatchTitle,
+          deviceTokensAndType
+        );
+      }
+
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res
@@ -726,11 +731,7 @@ exports.getUserProfile = async (req, res) => {
 };
 
 /******* Notifications ***/
-exports.setNotification = async (
-  deviceToken = [],
-  title = "",
-  message = ""
-) => {
+let setNotification = async (deviceToken = [], title = "", message = "") => {
   return new Promise((resolve, reject) => {
     try {
       for (
@@ -791,10 +792,11 @@ let saveNotification = async (
         notification_title: title,
         notification_message: message,
       };
+      console.log(updatePayload);
       user
         .updateOne(
           { _id: mongoose.Types.ObjectId(deviceToken[deviceTokenIndex]["id"]) },
-          { $set: { notifiction_detail: updatePayload } }
+          { $push: { notification_detail: updatePayload } }
         )
         .then((updateUser) => {
           if (updateUser.n === 1) {

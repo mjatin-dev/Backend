@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
   love_type: { type: String, default: "" },
   love_value: { type: String, default: "" },
   notification_on: { type: Number, default: 1 },
-  notifiction_detail: [
+  notification_detail: [
     {
       notification_type: { type: String, default: "" },
       notification_title: { type: String, default: "" },
