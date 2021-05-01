@@ -4,18 +4,23 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const moment = require("moment");
 const admin = require("../models/admin");
-const { helpers, notifications } = require("../utilities/");
+const {
+  helpers,
+  notifications,
+  notificationText,
+  globalConstants,
+} = require("../utilities/");
 
 /**
  *
  * @param {email} req
  * @param {*} res
  */
-exports.check_email = async (req, res) => {
+exports.checkEmail = async (req, res) => {
   try {
     let { email } = req.body;
-    let get_email = await user.find({ email });
-    if (get_email.length > 0) {
+    let getEmail = await user.find({ email });
+    if (getEmail.length > 0) {
       res.status(200).json({
         status: 200,
         message: "Email already exists!",
@@ -39,7 +44,7 @@ exports.check_email = async (req, res) => {
  * @param {name, email, password, gender, about_me, your_status, device_type, device_token} req
  * @param {*} res
  */
-exports.create_standard_user = async (req, res) => {
+exports.createStandardUser = async (req, res) => {
   try {
     let {
       name,
@@ -53,40 +58,40 @@ exports.create_standard_user = async (req, res) => {
       device_token,
     } = req.body;
 
-    let get_email = await user.find({ email });
-    if (get_email.length > 0) {
+    let getEmail = await user.find({ email });
+    if (getEmail.length > 0) {
       res.status(200).json({
         status: 200,
         message: "Email already exists!",
       });
     } else {
-      let find_date = await helpers._calculate_date(`'${date_of_birth}'`);
-      let new_user_instance = new user({
+      let findDate = await helpers._calculate_date(`'${date_of_birth}'`);
+      let newUserInstance = new user({
         name,
         email,
         password: bcrypt.hashSync(password, 10),
         gender,
         date_of_birth: moment(date_of_birth, "MM-DD-YYYY"),
-        age: find_date,
+        age: findDate,
         about_me,
         your_status,
         device_type,
         device_token,
         type: "standard",
       });
-      let create_user = await new_user_instance.save();
-      if (create_user) {
-        let checkuser_exists_or_not = await user
+      let createUser = await newUserInstance.save();
+      if (createUser) {
+        let checkuserExistsOrNot = await user
           .find({ _id: create_user._id })
           .lean()
           .exec();
-        let token = sigin(checkuser_exists_or_not[0]._id);
-        checkuser_exists_or_not[0].token = token;
+        let token = sigin(checkuserExistsOrNot[0]._id);
+        checkuserExistsOrNot[0].token = token;
 
         res.status(200).json({
           status: 200,
           message: "User has been created!",
-          data: checkuser_exists_or_not,
+          data: checkuserExistsOrNot,
         });
       } else {
         res.status(201).json({
@@ -108,30 +113,26 @@ exports.create_standard_user = async (req, res) => {
  * @param {email, password} req
  * @param {*} res
  */
-exports.standard_login = async (req, res) => {
+exports.standardLogin = async (req, res) => {
   try {
     let { email, password } = req.body;
 
     let get_detail =
       (await user.find({ email: email, type: "standard" }).lean().exec()) || [];
-    console.log(get_detail);
-    if (get_detail.length > 0) {
-      if (
-        !get_detail ||
-        !bcrypt.compareSync(password, get_detail[0].password)
-      ) {
+    if (getDetail.length > 0) {
+      if (!getDetail || !bcrypt.compareSync(password, getDetail[0].password)) {
         res.status(200).json({
           status: 200,
           message: "Invalid credentials!!",
         });
       } else {
-        let token = sigin(get_detail[0]._id);
-        get_detail[0].token = token;
+        let token = sigin(getDetail[0]._id);
+        getDetail[0].token = token;
 
         res.status(200).json({
           status: 200,
           message: "Login Successfully",
-          data: get_detail,
+          data: getDetail,
         });
       }
     } else {
@@ -154,7 +155,7 @@ exports.standard_login = async (req, res) => {
  * @param {*} res
  *
  */
-exports.social_signup = async (req, res) => {
+exports.socialSignup = async (req, res) => {
   try {
     let {
       name,
@@ -167,22 +168,22 @@ exports.social_signup = async (req, res) => {
       device_token,
       social_id,
     } = req.body;
-    let checkuser_exists_or_not = await user
+    let checkuserExistsOrNot = await user
       .find({ social_id: social_id })
       .lean()
       .exec();
 
-    if (checkuser_exists_or_not.length > 0) {
-      let token = sigin(checkuser_exists_or_not[0]._id);
-      checkuser_exists_or_not[0].token = token;
+    if (checkuserExistsOrNot.length > 0) {
+      let token = sigin(checkuserExistsOrNot[0]._id);
+      checkuserExistsOrNot[0].token = token;
 
       res.status(200).json({
         status: 400,
         message: "User already exists",
-        data: checkuser_exists_or_not,
+        data: checkuserExistsOrNot,
       });
     } else {
-      let new_user_instance = new user({
+      let newUserInstance = new user({
         name,
         email,
         gender,
@@ -193,20 +194,20 @@ exports.social_signup = async (req, res) => {
         social_id,
         type: "social",
       });
-      let create_user = await new_user_instance.save();
+      let createUser = await newUserInstance.save();
 
-      if (create_user) {
-        let checkuser_exists_or_not = await user
+      if (createUser) {
+        let checkuserExistsOrNot = await user
           .find({ _id: create_user._id })
           .lean()
           .exec();
-        let token = sigin(checkuser_exists_or_not[0]._id);
-        checkuser_exists_or_not[0].token = token;
+        let token = sigin(checkuserExistsOrNot[0]._id);
+        checkuserExistsOrNot[0].token = token;
 
         res.status(200).json({
           status: 200,
           message: "User has been created!",
-          data: checkuser_exists_or_not,
+          data: checkuserExistsOrNot,
         });
       } else {
         res.status(500).json({
@@ -228,7 +229,7 @@ exports.social_signup = async (req, res) => {
  * @param {latitude, longitude} req
  * @param {*} res
  */
-exports.update_location = async (req, res) => {
+exports.updateLocation = async (req, res) => {
   let { id } = req.user;
   let { latitude, longitude } = req.body;
 
@@ -237,18 +238,17 @@ exports.update_location = async (req, res) => {
     coordinates: [latitude, longitude],
   };
 
-  let update_location = await user
+  let updateLocation = await user
     .updateOne(
       { _id: mongoose.Types.ObjectId(id) },
       { $set: { location: location } }
     )
     .exec();
-  console.log(update_location);
-  if (update_location.n === 1) {
-    let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+  if (updateLocation.n === 1) {
+    let getUser = (await user.find({ _id: id }).lean().exec()) || [];
     res
       .status(200)
-      .json({ status: 200, message: "Update successfully", data: get_user });
+      .json({ status: 200, message: "Update successfully", data: getUser });
   } else {
     res
       .status(201)
@@ -261,22 +261,22 @@ exports.update_location = async (req, res) => {
  * @param {new_password} req
  * @param {*} res
  */
-exports.update_password = async (req, res) => {
+exports.updatePassword = async (req, res) => {
   let { id } = req.user;
   let { new_password: password } = req.body;
 
-  let update_password = await user
+  let updatePassword = await user
     .updateOne(
       { _id: mongoose.Types.ObjectId(id) },
       { $set: { password: bcrypt.hashSync(password, 10) } }
     )
     .exec();
 
-  if (update_password.n === 1) {
-    let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+  if (updatePassword.n === 1) {
+    let getUser = (await user.find({ _id: id }).lean().exec()) || [];
     res
       .status(200)
-      .json({ status: 200, message: "Update successfully", data: get_user });
+      .json({ status: 200, message: "Update successfully", data: getUser });
   } else {
     res
       .status(201)
@@ -289,18 +289,17 @@ exports.update_password = async (req, res) => {
  * @param {new_password} req
  * @param {*} res
  */
-exports.update_notification = async (req, res) => {
+exports.updateNotification = async (req, res) => {
   let { id } = req.user;
   let { notification_on } = req.body;
 
-  let update_notification = await user
+  let updateNotification = await user
     .updateOne(
       { _id: mongoose.Types.ObjectId(id) },
       { $set: { notification_on: notification_on } }
     )
     .exec();
-  console.log(update_notification);
-  if (update_notification.n === 1) {
+  if (updateNotification.n === 1) {
     let get_user = (await user.find({ _id: id }).lean().exec()) || [];
     res
       .status(200)
@@ -318,7 +317,7 @@ exports.update_notification = async (req, res) => {
  * @param {*} res
  */
 
-exports.update_user = async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
     let { id } = req.user;
     let {
@@ -331,9 +330,9 @@ exports.update_user = async (req, res) => {
       images,
       about_me,
     } = req.body;
-    let update_payload = {};
+    let updatePayload = {};
     if (step == 1) {
-      update_payload = {
+      updatePayload = {
         age_range: age_range
           ? { min: age_range.min, max: age_range.max }
           : { min: 0, max: 0 },
@@ -344,22 +343,19 @@ exports.update_user = async (req, res) => {
       };
     } else {
       for (const key in req.body) {
-        console.log(key);
-        update_payload[key] = req.body[key];
+        updatePayload[key] = req.body[key];
       }
     }
 
-    console.log(update_payload);
-
-    let update_user = await user
+    let updateUser = await user
       .updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: update_payload })
       .exec();
 
-    if (update_user.n === 1) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+    if (updateUser.n === 1) {
+      let getUser = (await user.find({ _id: id }).lean().exec()) || [];
       res
         .status(200)
-        .json({ status: 200, message: "Update successfully", data: get_user });
+        .json({ status: 200, message: "Update successfully", data: getUser });
     } else {
       res
         .status(201)
@@ -377,13 +373,13 @@ exports.update_user = async (req, res) => {
  * @param {member_id} req
  * @param {*} res
  */
-exports.like_user = async (req, res) => {
+exports.likeUser = async (req, res) => {
   try {
     let { id } = req.user;
     let { member_id } = req.body;
-    let device_token = [];
+    let deviceTokensAndType = [];
 
-    let check_is_like_by_user =
+    let checkIsAlreadyLikeUser =
       (await find({
         $and: [
           { _id: mongoose.Types.ObjectId(member_id) },
@@ -393,14 +389,19 @@ exports.like_user = async (req, res) => {
         .lean()
         .exec()) | [];
 
-    if (check_is_like_by_user > 0) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
-      device_token.push(get_user[0].device_token);
-
-      res.status(200).json({ status: 200, message: "Update successfully" });
+    if (checkIsAlreadyLikeUser > 0) {
+      let getUser =
+        (await user
+          .find({ _id: mongoose.Types.ObjectId(member_id) })
+          .lean()
+          .exec()) || [];
+      deviceTokensAndType.push({
+        token: getUser[0].device_token,
+        type: getUser[0].device_type,
+      });
     }
 
-    let update_notification = await user
+    let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
         {
@@ -413,9 +414,18 @@ exports.like_user = async (req, res) => {
       )
       .exec();
 
-    if (update_notification.n === 1) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
-      device_token.push(get_user[0].device_token);
+    if (updateNotification.n === 1) {
+      let getUser = (await user.find({ _id: id }).lean().exec()) || [];
+      deviceTokensandType.push({
+        token: getUser[0].device_token,
+        type: getUser[0].device_type,
+      });
+      let { userMatchMessage, userMatchTitle } = notificationText.messages;
+      await setNotification(
+        userMatchMessage,
+        userMatchTitle,
+        deviceTokensAndType
+      );
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res
@@ -435,12 +445,12 @@ exports.like_user = async (req, res) => {
  * @param {member_id} req
  * @param {*} res
  */
-exports.dislike_user = async (req, res) => {
+exports.dislikeUser = async (req, res) => {
   try {
     let { id } = req.user;
     let { member_id } = req.body;
 
-    let update_notification = await user
+    let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
         {
@@ -453,8 +463,7 @@ exports.dislike_user = async (req, res) => {
       )
       .exec();
 
-    if (update_notification.n === 1) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+    if (updateNotification.n === 1) {
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res.status(201).json({ status: 201, message: "Something went wrong" });
@@ -471,20 +480,19 @@ exports.dislike_user = async (req, res) => {
  * @param {member_id} req
  * @param {*} res
  */
-exports.block_user = async (req, res) => {
+exports.blockUser = async (req, res) => {
   try {
     let { id } = req.user;
     let { member_id } = req.body;
 
-    let update_notification = await user
+    let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
         { $set: { blocked_users: mongoose.Types.ObjectId(member_id) } }
       )
       .exec();
 
-    if (update_notification.n === 1) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+    if (updateNotification.n === 1) {
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res.status(201).json({ status: 201, message: "Something went wrong" });
@@ -501,7 +509,7 @@ exports.block_user = async (req, res) => {
  * @param {reported_by,reported_to,reason} req
  * @param {*} res
  */
-exports.report_user = async (req, res) => {
+exports.reportUser = async (req, res) => {
   try {
     let { id } = req.user;
     let { reported_by_user_id, reason } = req.body;
@@ -509,15 +517,14 @@ exports.report_user = async (req, res) => {
       reported_by_user_id: mongoose.Types.ObjectId(reported_by_user_id),
       reason,
     };
-    let update_notification = await user
+    let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
         { $set: { reported_by: payload } }
       )
       .exec();
 
-    if (update_notification.n === 1) {
-      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+    if (updateNotification.n === 1) {
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res.status(201).json({ status: 201, message: "Something went wrong" });
@@ -529,9 +536,9 @@ exports.report_user = async (req, res) => {
   }
 };
 
-exports.get_questions = async (req, res) => {
+exports.getQuestions = async (req, res) => {
   try {
-    let list_questions =
+    let listQuestions =
       (await admin
         .find(
           {},
@@ -545,11 +552,11 @@ exports.get_questions = async (req, res) => {
         )
         .lean()
         .exec()) || [];
-    if (list_questions.length > 0) {
+    if (listQuestions.length > 0) {
       res.status(200).json({
         status: 200,
         message: "Questions List",
-        data: list_questions[0],
+        data: listQuestions[0],
       });
     } else {
       res.status(201).json({ status: 201, message: "No list found", data: [] });
@@ -567,10 +574,10 @@ exports.get_questions = async (req, res) => {
  * @param {*} res
  */
 
-exports.user_list = async (req, res) => {
+exports.userList = async (req, res) => {
   try {
     let { id } = req.user;
-    let user_detail = await user
+    let userDetail = await user
       .findOne({ _id: mongoose.Types.ObjectId(id) })
       .lean()
       .exec();
@@ -590,18 +597,17 @@ exports.user_list = async (req, res) => {
         { _id: { $nin: disliked_members } },
       ],
     };
-    let user_list = (await user.find(condition)) || [];
-    if (user_list.length > 0) {
+    let userList = (await user.find(condition)) || [];
+    if (userList.length > 0) {
       res
         .status(200)
-        .json({ status: 200, message: "Users List", data: user_list });
+        .json({ status: 200, message: "Users List", data: userList });
     } else {
       res
         .status(201)
-        .json({ status: 201, message: "Users List", data: user_list });
+        .json({ status: 201, message: "Users List", data: userList });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       status: 500,
       message: error.message || "Internal server error!!",
@@ -614,71 +620,63 @@ exports.user_list = async (req, res) => {
  * @param { }req
  * @param {*} res
  */
-exports.user_answers = async (req, res) => {
+exports.userAnswers = async (req, res) => {
   try {
     let { data } = req.body;
     let { id } = req.user;
 
-    let extravert_introversion = data.filter(function (value) {
-      return value.type === "extravert_introversion";
+    let extravertIntroversion = data.filter(function (value) {
+      return value.type === globalConstants.constant.extravertIntroversion;
     });
 
-    let intuition_sensing = data.filter(function (value) {
-      return value.type === "intuition_sensing";
+    let intuitionSensing = data.filter(function (value) {
+      return value.type === globalConstants.constant.intuitionSensing;
     });
 
-    let thinking_feeling = data.filter(function (value) {
-      return value.type === "thinking_feeling";
+    let thinkingFeeling = data.filter(function (value) {
+      return value.type === globalConstants.constant.thinkingFeeling;
     });
 
-    let juding_perceiving = data.filter(function (value) {
-      return value.type === "juding_perceiving";
+    let judingPerceiving = data.filter(function (value) {
+      return value.type === globalConstants.constant.judingPerceiving;
     });
 
-    let extravert_introversion_count = await helpers._count(
-      extravert_introversion[0].anwser
-    )
-    
-    let intuition_sensing_count = await helpers._count(
-      intuition_sensing[0].anwser
-    );
-    let thinking_feeling_count = await helpers._count(
-      thinking_feeling[0].anwser
-    );
-    let juding_perceiving_count = await helpers._count(
-      juding_perceiving[0].anwser
+    let extravertIntroversionCount = await helpers._count(
+      extravertIntroversion[0].anwser
     );
 
-    console.log(extravert_introversion_count);
+    let intuitionSensingCount = await helpers._count(
+      intuitionSensing[0].anwser
+    );
+    let thinkingFeelingCount = await helpers._count(thinkingFeeling[0].anwser);
+    let judingPerceivingCount = await helpers._count(
+      judingPerceiving[0].anwser
+    );
 
-    let generated_code = `${extravert_introversion_count[0].value}${intuition_sensing_count[0].value}${thinking_feeling_count[0].value}${juding_perceiving_count[0].value}`;
+    let generatedCode = `${extravertIntroversionCount[0].value}${intuitionSensingCount[0].value}${thinkingFeelingCount[0].value}${judingPerceivingCount[0].value}`;
 
     let getTypes = await typeModel.find({}, { type: 1 });
     let getUserType = getTypes[0].type.filter(function (value) {
-      return value.code === generated_code;
+      return value.code === generatedCode;
     });
 
-    console.log(getUserType,generated_code)
-
-    let update_love_type = await user
+    let updateLoveType = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
         {
-          $set: { love_type: generated_code, love_value: getUserType[0].value },
+          $set: { love_type: generatedCode, love_value: getUserType[0].value },
         }
       )
       .exec();
-    if (update_love_type.n === 1) {
+    if (updateLoveType.n === 1) {
       let { love_type, love_value } =
         (await user.findOne({ _id: id }).lean().exec()) || [];
 
-      res
-        .status(200)
-        .json({
-          status: 200,
-          message: "Update successfully",
-          data: { love_type, love_value },
-        });
+      res.status(200).json({
+        status: 200,
+        message: "Update successfully",
+        data: { love_type, love_value },
+      });
     } else {
       res
         .status(201)
@@ -691,34 +689,73 @@ exports.user_answers = async (req, res) => {
   }
 };
 
-exports.send_notification = async (req, res) => {
-  console.log(await notifications.sendAndroid());
-};
-
 /**
  * @param {user_id}req
  * @param {*} res
  *
  */
-exports.get_user_profile = async (req, res) => {
+exports.getUserProfile = async (req, res) => {
   try {
     let { user_id } = req.query;
-    console.log(req.query);
-    let user_detail =
+    let userDetail =
       (await user
         .find({ _id: mongoose.Types.ObjectId(user_id) })
         .lean()
         .exec()) || [];
-    user_detail.length > 0
+    userDetail.length > 0
       ? res
           .status(200)
-          .json({ status: 200, message: "user detail", data: user_detail })
+          .json({ status: 200, message: "user detail", data: userDetail })
       : res
           .status(201)
-          .json({ status: 201, message: "no detail found", data: user_detail });
+          .json({ status: 201, message: "no detail found", data: userDetail });
   } catch (error) {
     res
       .status(500)
       .json({ status: 500, message: error.message || "Something went wrong" });
+  }
+};
+
+/******* Notifications ***/
+exports.setNotification = async (
+  deviceToken = [],
+  title = "",
+  message = ""
+) => {
+  return new Promise((resolve, reject) => {
+    try {
+      for (
+        let deviceTokenIndex = 0;
+        deviceTokenIndex < deviceToken.length;
+        deviceTokenIndex++
+      ) {
+        if (
+          deviceToken[deviceTokenIndex]["type"] ===
+          globalConstants.constant.typeAndroid
+        ) {
+          sendNotification(message, title, deviceToken, deviceTokenIndex);
+        }
+      }
+      resolve(true);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let sendNotification = async (
+  message,
+  title,
+  deviceToken,
+  deviceTokenIndex
+) => {
+  try {
+    await notifications.sendAndroid(
+      message,
+      title,
+      deviceToken[deviceTokenIndex]["token"]
+    );
+  } catch (error) {
+    console.error(error);
   }
 };

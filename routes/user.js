@@ -5,27 +5,26 @@ const { user } = require("../controllers");
 const { validate } = require("../validation");
 const { verify } = require("../auth");
 
-router.post("/check_email", validate.check_email, user.check_email);
-router.post("/standard_signup", validate.signup, user.create_standard_user);
-router.post("/standard_login", validate.standard_login, user.standard_login);
-router.post("/social_signup", user.social_signup);
+router.post("/check_email", validate.check_email, user.checkEmail);
+router.post("/standard_signup", validate.signup, user.createStandardUser);
+router.post("/standard_login", validate.standard_login, user.standardLogin);
+router.post("/social_signup", user.socialSignup);
 router.post(
   "/update_location",
   verify,
   validate.update_location,
-  user.update_location
+  user.updateLocation
 );
-router.post("/update_notification", verify, user.update_notification);
-router.post("/update_password", verify, user.update_password);
-router.post("/update_user", verify, user.update_user);
-router.post("/like_user", verify, validate.like_user, user.like_user);
-router.post("/dislike_user", verify, validate.like_user, user.dislike_user);
-router.post("/block_user", verify, validate.like_user, user.block_user);
-router.post("/report_user", verify, validate.report_user, user.report_user);
-router.get("/get_questions", verify, user.get_questions);
-router.get("/user_list", verify, user.user_list);
-router.post("/user_answers", verify, user.user_answers);
-router.get("/send_notification", user.send_notification);
-router.get("/user_detail", verify, validate.user_detail, user.get_user_profile);
+router.post("/update_notification", verify, user.updateNotification);
+router.post("/update_password", verify, user.updatePassword);
+router.post("/update_user", verify, user.updateUser);
+router.post("/like_user", verify, validate.like_user, user.likeUser);
+router.post("/dislike_user", verify, validate.like_user, user.dislikeUser);
+router.post("/block_user", verify, validate.like_user, user.blockUser);
+router.post("/report_user", verify, validate.report_user, user.reportUser);
+router.get("/get_questions", verify, user.getQuestions);
+router.get("/user_list", verify, user.userList);
+router.post("/user_answers", verify, user.userAnswers);
+router.get("/user_detail", verify, validate.user_detail, user.getUserProfile);
 
 module.exports = router;
