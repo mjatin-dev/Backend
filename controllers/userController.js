@@ -385,7 +385,13 @@ exports.likeUser = async (req, res) => {
         .find({
           $and: [
             { _id: mongoose.Types.ObjectId(member_id) },
-            { liked_user_id: { $in: [mongoose.Types.ObjectId(id)] } },
+            {
+              liked_members: {
+                $elemMatch: {
+                  liked_user_id: mongoose.Types.ObjectId(id),
+                },
+              },
+            },
           ],
         })
         .lean()
@@ -769,8 +775,11 @@ let sendNotification = async (
   deviceTokenIndex
 ) => {
   try {
+    let body = {
+      type: deviceToken[deviceTokenIndex]["type"],
+    };
     await notifications.sendAndroid(
-      message,
+      body,
       title,
       deviceToken[deviceTokenIndex]["token"]
     );
