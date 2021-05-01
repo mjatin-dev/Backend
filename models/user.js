@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema({
     {
       notification_type: { type: String, default: "" },
       notification_title: { type: String, default: "" },
+      notification_message: { type: String, default: "" },
       send_at: { type: Date, default: Date.now() },
     },
   ],

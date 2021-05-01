@@ -397,8 +397,10 @@ exports.likeUser = async (req, res) => {
           .lean()
           .exec()) || [];
       deviceTokensAndType.push({
+        id: getUser[0]._id,
         token: getUser[0].device_token,
         type: getUser[0].device_type,
+        notificationType: globalConstants.constant.matchNotificationTypeName,
       });
     }
 
@@ -418,8 +420,10 @@ exports.likeUser = async (req, res) => {
     if (updateNotification.n === 1) {
       let getUser = (await user.find({ _id: id }).lean().exec()) || [];
       deviceTokensandType.push({
+        id: getUser[0]._id,
         token: getUser[0].device_token,
         type: getUser[0].device_type,
+        notificationType: globalConstants.constant.matchNotificationTypeName,
       });
       let { userMatchMessage, userMatchTitle } = notificationText.messages;
       await setNotification(
@@ -583,7 +587,7 @@ exports.userList = async (req, res) => {
       .lean()
       .exec();
 
-    let { liked_members, disliked_members } = user_detail;
+    let { liked_members, disliked_members } = userDetail;
     liked_members = liked_members
       ? liked_members.map((data) => data.liked_user_id)
       : [];
@@ -734,7 +738,15 @@ exports.setNotification = async (
           deviceToken[deviceTokenIndex]["type"] ===
           globalConstants.constant.typeAndroid
         ) {
-          sendNotification(message, title, deviceToken, deviceTokenIndex);
+          sendNotification(message, title, deviceToken, deviceTokenIndex)
+            .then((isSend) => {
+              saveNotification(message, title, deviceToken, deviceTokenIndex)
+                .then((isSave) => {
+                  console.log(isSave);
+                })
+                .catch((error) => console.log(error));
+            })
+            .catch((error) => console.error(error));
         }
       }
       resolve(true);
@@ -759,4 +771,34 @@ let sendNotification = async (
   } catch (error) {
     console.error(error);
   }
+};
+
+let saveNotification = async (
+  message,
+  title,
+  deviceToken,
+  deviceTokenIndex
+) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let updatePayload = {
+        notification_type: deviceToken[deviceTokenIndex]["notificationType"],
+        notification_title: title,
+        notification_message: message,
+      };
+      user
+        .updateOne(
+          { _id: mongoose.Types.ObjectId(deviceToken[deviceTokenIndex]["id"]) },
+          { $set: { notifiction_detail: updatePayload } }
+        )
+        .then((updateUser) => {
+          if (updateUser.n === 1) {
+            resolve(true);
+          }
+        })
+        .catch((error) => reject(error));
+    } catch (error) {
+      reject(error);
+    }
+  });
 };

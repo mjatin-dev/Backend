@@ -5,4 +5,5 @@ exports.constant = {
   intuitionSensing: "intuition_sensing",
   thinkingFeeling: "thinking_feeling",
   judingPerceiving: "juding_perceiving",
+  matchNotificationTypeName: "match",
 };
