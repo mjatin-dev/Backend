@@ -1,4 +1,4 @@
-const { user } = require("../models/");
+const { user, typeModel } = require("../models/");
 const { sigin } = require("../auth/");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
@@ -381,6 +381,24 @@ exports.like_user = async (req, res) => {
   try {
     let { id } = req.user;
     let { member_id } = req.body;
+    let device_token = [];
+
+    let check_is_like_by_user =
+      (await find({
+        $and: [
+          { _id: mongoose.Types.ObjectId(member_id) },
+          { liked_user_id: { $in: [mongoose.Types.ObjectId(_id)] } },
+        ],
+      })
+        .lean()
+        .exec()) | [];
+
+    if (check_is_like_by_user > 0) {
+      let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+      device_token.push(get_user[0].device_token);
+
+      res.status(200).json({ status: 200, message: "Update successfully" });
+    }
 
     let update_notification = await user
       .updateOne(
@@ -397,6 +415,7 @@ exports.like_user = async (req, res) => {
 
     if (update_notification.n === 1) {
       let get_user = (await user.find({ _id: id }).lean().exec()) || [];
+      device_token.push(get_user[0].device_token);
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res
@@ -512,12 +531,25 @@ exports.report_user = async (req, res) => {
 
 exports.get_questions = async (req, res) => {
   try {
-    let list_questions = (await admin.find({}).lean().exec()) || [];
+    let list_questions =
+      (await admin
+        .find(
+          {},
+          {
+            extravert_introversion: 1,
+            intuition_sensing: 1,
+            thinking_feeling: 1,
+            juding_perceiving: 1,
+            _id: 0,
+          }
+        )
+        .lean()
+        .exec()) || [];
     if (list_questions.length > 0) {
       res.status(200).json({
         status: 200,
         message: "Questions List",
-        data: list_questions[0].question_list,
+        data: list_questions[0],
       });
     } else {
       res.status(201).json({ status: 201, message: "No list found", data: [] });
@@ -584,29 +616,69 @@ exports.user_list = async (req, res) => {
  */
 exports.user_answers = async (req, res) => {
   try {
+    let { data } = req.body;
     let { id } = req.user;
-    let { answer_list } = req.body;
 
-    let count_result = await helpers._count(answer_list.split(","));
-    let sort_result = count_result.sort((a, b) =>
-      a.count < b.count ? 1 : b.count < a.count ? -1 : 0
+    let extravert_introversion = data.filter(function (value) {
+      return value.type === "extravert_introversion";
+    });
+
+    let intuition_sensing = data.filter(function (value) {
+      return value.type === "intuition_sensing";
+    });
+
+    let thinking_feeling = data.filter(function (value) {
+      return value.type === "thinking_feeling";
+    });
+
+    let juding_perceiving = data.filter(function (value) {
+      return value.type === "juding_perceiving";
+    });
+
+    let extravert_introversion_count = await helpers._count(
+      extravert_introversion[0].anwser
+    )
+    
+    let intuition_sensing_count = await helpers._count(
+      intuition_sensing[0].anwser
     );
-    let top_four_result = sort_result
-      .slice(0, 4)
-      .map((data) => data.value)
-      .join("");
+    let thinking_feeling_count = await helpers._count(
+      thinking_feeling[0].anwser
+    );
+    let juding_perceiving_count = await helpers._count(
+      juding_perceiving[0].anwser
+    );
+
+    console.log(extravert_introversion_count);
+
+    let generated_code = `${extravert_introversion_count[0].value}${intuition_sensing_count[0].value}${thinking_feeling_count[0].value}${juding_perceiving_count[0].value}`;
+
+    let getTypes = await typeModel.find({}, { type: 1 });
+    let getUserType = getTypes[0].type.filter(function (value) {
+      return value.code === generated_code;
+    });
+
+    console.log(getUserType,generated_code)
 
     let update_love_type = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
-        { $set: { love_type: top_four_result } }
+        {
+          $set: { love_type: generated_code, love_value: getUserType[0].value },
+        }
       )
       .exec();
     if (update_love_type.n === 1) {
-      let { love_type } = (await user.findOne({ _id: id }).lean().exec()) || [];
+      let { love_type, love_value } =
+        (await user.findOne({ _id: id }).lean().exec()) || [];
+
       res
         .status(200)
-        .json({ status: 200, message: "Update successfully", data: love_type });
+        .json({
+          status: 200,
+          message: "Update successfully",
+          data: { love_type, love_value },
+        });
     } else {
       res
         .status(201)

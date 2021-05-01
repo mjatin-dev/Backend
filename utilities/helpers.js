@@ -20,7 +20,8 @@ exports._count = (array) => {
       if (cnt > 0) {
         counted_array.push({ count: cnt, value: current });
       }
-      resolve(counted_array);
+
+      resolve(counted_array.sort((a, b) => (a.count < b.count) ? 1 : -1));
     } catch (error) {
       reject(error);
     }

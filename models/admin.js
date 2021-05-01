@@ -10,12 +10,16 @@ const adminSchema = new mongoose.Schema({
       options: [
         {
           option_type: { type: String, default: "" },
-          option_title: { type: String, default: "" },
+          option_title: { type: String, default: "" }, 
         },
       ],
       create_at: { type: Date, default: Date.now() },
     },
   ],
+  type:[{
+    code:{type:String,default:""},
+    value:{type:String,default:""}  
+  }],
   create_at: { type: Date, default: Date.now() },
 });
 

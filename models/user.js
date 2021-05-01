@@ -58,8 +58,15 @@ const userSchema = new mongoose.Schema({
     coordinates: { type: [Number] },
   },
   love_type: { type: String, default: "" },
+  love_value:{type:String,default:""},
   notification_on: { type: Number, default: 1 },
-  create_at: { type: Date, default: Date.now() },
+  notifiction_detail:[{
+    notification_type:{type:String,default:""},
+    notification_title:{type:String,default:""},
+    send_at:{type:Date,default:Date.now()}
+
+  }],
+  create_at: { type: Date, default: Date.now() }
 });
 
 module.exports = mongoose.model("user", userSchema);

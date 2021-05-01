@@ -1,18 +1,18 @@
 const { firebaseConfig } = require("../firebase/admin");
 
-exports.sendAndroid = () => {
+exports.sendAndroid = (message = "", title = "", token) => {
   return new Promise((resolve, reject) => {
     try {
-      const registrationToken =
-        "dn96nUAW6qs:APA91bEugEFIzCZxgR5V1yn4u0xk6xNkZ9nesAcp7m_rbwUrOomQlY0xMtzF_zSIwHmWjMl2-43yB8cTkxaOF7WtI1hIM_o9ce1TLLw_HWKzWMI2fIZ-QCXgkYW0sTqdCGSt2tHZGHA8";
+      const registrationToken = token;
+
       var message = {
         notification: {
-          title: "hello",
-          body: "hello",
+          title: title,
+          body: message,
         },
         token: registrationToken,
       };
-
+ 
       firebaseConfig
         .messaging()
         .send(message)

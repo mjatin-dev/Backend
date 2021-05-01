@@ -1,4 +1,4 @@
-const { admin, question, user } = require("../models/");
+const { admin, question, user, typeModel } = require("../models/");
 const { sigin } = require("../auth/");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -108,7 +108,6 @@ exports.addquestion = async (req, res) => {
       question,
       options: option_list,
     };
-    console.log(id);
     let update = await admin.updateOne(
       { _id: mongoose.Types.ObjectId(id) },
       { $push: { question_list } }
@@ -134,6 +133,39 @@ exports.addquestion = async (req, res) => {
     });
   }
 };
+
+exports.addType = async(req,res)=>{
+	try {
+    let { code, value } = req.body;
+   // let { id } = req.user;
+    let id = '608583764ca3b63df7c19780';
+  
+
+      let type = {
+      code,
+      value,
+    };
+    let update = await typeModel.updateOne(
+      { _id: mongoose.Types.ObjectId(id) },
+      { $push: { type } }
+    );
+   
+    if (update.n === 1) {
+      res
+        .status(200)
+        .json({ status: 200, message: "Update successfully", data: "done" });
+    } else {
+      res
+        .status(400)
+        .json({ status: 400, message: "Something went wrong", data: [] });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Interal server error!",
+    });
+  }
+}
 
 /**
  * @param {} req
