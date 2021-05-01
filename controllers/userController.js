@@ -385,7 +385,7 @@ exports.likeUser = async (req, res) => {
         .find({
           $and: [
             { _id: mongoose.Types.ObjectId(member_id) },
-            { liked_user_id: { $in: [mongoose.Types.ObjectId(_id)] } },
+            { liked_user_id: { $in: [mongoose.Types.ObjectId(id)] } },
           ],
         })
         .lean()
