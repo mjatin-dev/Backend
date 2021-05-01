@@ -71,7 +71,7 @@ exports.createStandardUser = async (req, res) => {
         email,
         password: bcrypt.hashSync(password, 10),
         gender,
-        date_of_birth: moment(date_of_birth, "MM-DD-YYYY"),
+        date_of_birth: moment(new Date(date_of_birth)).format("MM-DD-YYYY"),
         age: findDate,
         about_me,
         your_status,
@@ -80,9 +80,10 @@ exports.createStandardUser = async (req, res) => {
         type: "standard",
       });
       let createUser = await newUserInstance.save();
+
       if (createUser) {
         let checkuserExistsOrNot = await user
-          .find({ _id: create_user._id })
+          .find({ _id: createUser._id })
           .lean()
           .exec();
         let token = sigin(checkuserExistsOrNot[0]._id);

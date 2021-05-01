@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
+const defaultTimeZone = moment.tz(Date.now(), "Asia/Kolkata");
 
 const userSchema = new mongoose.Schema({
   name: { type: String, default: "" },
@@ -7,7 +9,7 @@ const userSchema = new mongoose.Schema({
   about_me: { type: String, default: "" },
   your_status: { type: String, default: "" },
   gender: { type: String, default: "" },
-  date_of_birth: { type: Date, default: Date.now() },
+  date_of_birth: { type: String },
   age: { type: Number, default: 0 },
   age_range: {
     min: { type: Number },
@@ -58,15 +60,16 @@ const userSchema = new mongoose.Schema({
     coordinates: { type: [Number] },
   },
   love_type: { type: String, default: "" },
-  love_value:{type:String,default:""},
+  love_value: { type: String, default: "" },
   notification_on: { type: Number, default: 1 },
-  notifiction_detail:[{
-    notification_type:{type:String,default:""},
-    notification_title:{type:String,default:""},
-    send_at:{type:Date,default:Date.now()}
-
-  }],
-  create_at: { type: Date, default: Date.now() }
+  notifiction_detail: [
+    {
+      notification_type: { type: String, default: "" },
+      notification_title: { type: String, default: "" },
+      send_at: { type: Date, default: Date.now() },
+    },
+  ],
+  create_at: { type: Date, default: defaultTimeZone },
 });
 
 module.exports = mongoose.model("user", userSchema);
