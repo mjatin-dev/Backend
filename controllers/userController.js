@@ -381,12 +381,13 @@ exports.likeUser = async (req, res) => {
     let deviceTokensAndType = [];
 
     let checkIsAlreadyLikeUser =
-      (await find({
-        $and: [
-          { _id: mongoose.Types.ObjectId(member_id) },
-          { liked_user_id: { $in: [mongoose.Types.ObjectId(_id)] } },
-        ],
-      })
+      (await user
+        .find({
+          $and: [
+            { _id: mongoose.Types.ObjectId(member_id) },
+            { liked_user_id: { $in: [mongoose.Types.ObjectId(_id)] } },
+          ],
+        })
         .lean()
         .exec()) | [];
 
