@@ -26,6 +26,6 @@ router.get("/get_questions", verify, user.getQuestions);
 router.get("/user_list", verify, user.userList);
 router.post("/user_answers", verify, user.userAnswers);
 router.get("/user_detail", verify, validate.user_detail, user.getUserProfile);
-router.get("get_notification", verify, user.getNotifications);
+router.get("/user_notification", verify, user.getNotifications);
 
 module.exports = router;

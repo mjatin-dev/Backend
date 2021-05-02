@@ -398,7 +398,7 @@
         }
       }
     },
-    "/user_notifications": {
+    "/user_notification": {
       "get": {
         "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
         "parameters": [
