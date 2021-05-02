@@ -1,8 +1,9 @@
 const user = require("../models/user");
+const mongoose = require("mongoose");
 const { notifications, globalConstants } = require("../utilities");
 
 /******* Notifications ***/
-let setNotification = async (deviceToken = [], title = "", message = "") => {
+let setNotification = async (message = "", title = "", deviceToken = []) => {
   return new Promise((resolve, reject) => {
     try {
       for (
@@ -11,8 +12,7 @@ let setNotification = async (deviceToken = [], title = "", message = "") => {
         deviceTokenIndex++
       ) {
         if (
-          deviceToken[deviceTokenIndex]["type"] ===
-          globalConstants.typeAndroid
+          deviceToken[deviceTokenIndex]["type"] === globalConstants.typeAndroid
         ) {
           sendNotification(message, title, deviceToken, deviceTokenIndex)
             .then((isSend) => {
@@ -66,7 +66,6 @@ let saveNotification = async (
         notification_title: title,
         notification_message: message,
       };
-      console.log(updatePayload);
       user
         .updateOne(
           { _id: mongoose.Types.ObjectId(deviceToken[deviceTokenIndex]["id"]) },

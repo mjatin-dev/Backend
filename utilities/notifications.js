@@ -1,6 +1,7 @@
 const { firebaseConfig } = require("../firebase/admin");
 
 exports.sendAndroid = (body = "", title = "", token) => {
+  console.log(body, title, token);
   return new Promise((resolve, reject) => {
     try {
       const registrationToken = token;
@@ -8,8 +9,8 @@ exports.sendAndroid = (body = "", title = "", token) => {
       var message = {
         notification: {
           title: title,
-          body: body,
         },
+        data: body,
         token: registrationToken,
       };
 
@@ -23,7 +24,6 @@ exports.sendAndroid = (body = "", title = "", token) => {
           reject(error);
         });
     } catch (error) {
-      console.log(error);
       reject(error);
     }
   });

@@ -122,6 +122,7 @@ exports.standardLogin = async (req, res) => {
 
     let getDetail =
       (await user.find({ email: email, type: "standard" }).lean().exec()) || [];
+    console.log(getDetail);
     if (getDetail.length > 0) {
       if (!getDetail || !bcrypt.compareSync(password, getDetail[0].password)) {
         res.status(400).json({
@@ -397,9 +398,7 @@ exports.likeUser = async (req, res) => {
           ],
         })
         .lean()
-        .exec()) | [];
-
-    console.log("user_id", checkIsAlreadyLikeUser);
+        .exec()) || [];
 
     if (checkIsAlreadyLikeUser.length > 0) {
       let getUser =
@@ -415,7 +414,6 @@ exports.likeUser = async (req, res) => {
       });
     }
 
-    console.log(deviceTokensAndType);
     let updateNotification = await user
       .updateOne(
         { _id: mongoose.Types.ObjectId(id) },
@@ -428,7 +426,6 @@ exports.likeUser = async (req, res) => {
         }
       )
       .exec();
-    console.log(updateNotification);
 
     if (updateNotification.n === 1) {
       let getUser = (await user.find({ _id: id }).lean().exec()) || [];
@@ -736,5 +733,40 @@ exports.getUserProfile = async (req, res) => {
     res
       .status(500)
       .json({ status: 500, message: error.message || "Something went wrong" });
+  }
+};
+
+/**
+ * @param {} req
+ * @param {*} res
+ */
+exports.getNotifications = async (req, res) => {
+  try {
+    let { id } = req.user;
+    let listNotifications =
+      (await user
+        .find(
+          { _id: mongoose.Types.ObjectId(id) },
+          {
+            notification_detail: 1,
+            _id: 0,
+          }
+        )
+        .lean()
+        .exec()) || [];
+    if (listNotifications.length > 0) {
+      res.status(200).json({
+        status: 200,
+        message: "Questions List",
+        data: listNotifications,
+      });
+    } else {
+      res.status(201).json({ status: 201, message: "No list found", data: [] });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Something went wrong",
+    });
   }
 };
