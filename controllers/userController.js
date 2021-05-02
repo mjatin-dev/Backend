@@ -411,7 +411,7 @@ exports.likeUser = async (req, res) => {
         id: getUser[0]._id,
         token: getUser[0].device_token,
         type: getUser[0].device_type,
-        notificationType: globalConstants.constant.matchNotificationTypeName,
+        notificationType: globalConstants.matchNotificationTypeName,
       });
     }
 
@@ -436,12 +436,12 @@ exports.likeUser = async (req, res) => {
         id: getUser[0]._id,
         token: getUser[0].device_token,
         type: getUser[0].device_type,
-        notificationType: globalConstants.constant.matchNotificationTypeName,
+        notificationType: globalConstants.matchNotificationTypeName,
       });
 
       if (deviceTokensAndType.length > 0) {
         let { userMatchMessage, userMatchTitle } = notificationText.messages;
-        
+
         await notificationService.setNotification(
           userMatchMessage,
           userMatchTitle,
@@ -649,19 +649,19 @@ exports.userAnswers = async (req, res) => {
     let { id } = req.user;
 
     let extravertIntroversion = data.filter(function (value) {
-      return value.type === globalConstants.constant.extravertIntroversion;
+      return value.type === globalConstants.extravertIntroversion;
     });
 
     let intuitionSensing = data.filter(function (value) {
-      return value.type === globalConstants.constant.intuitionSensing;
+      return value.type === globalConstants.intuitionSensing;
     });
 
     let thinkingFeeling = data.filter(function (value) {
-      return value.type === globalConstants.constant.thinkingFeeling;
+      return value.type === globalConstants.thinkingFeeling;
     });
 
     let judingPerceiving = data.filter(function (value) {
-      return value.type === globalConstants.constant.judingPerceiving;
+      return value.type === globalConstants.judingPerceiving;
     });
 
     let extravertIntroversionCount = await helpers._count(
