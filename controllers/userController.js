@@ -403,15 +403,23 @@ exports.likeUser = async (req, res) => {
     if (checkIsAlreadyLikeUser.length > 0) {
       let getUser =
         (await user
-          .find({ _id: mongoose.Types.ObjectId(member_id) })
+          .find({
+            $or: [
+              { _id: mongoose.Types.ObjectId(member_id) },
+              { _id: mongoose.Types.ObjectId(id) },
+            ],
+          })
           .lean()
           .exec()) || [];
-      deviceTokensAndType.push({
-        id: getUser[0]._id,
-        token: getUser[0].device_token,
-        type: getUser[0].device_type,
-        notificationType: globalConstants.matchNotificationTypeName,
-      });
+
+      for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
+        deviceTokensAndType.push({
+          id: getUser[userIndex]._id,
+          token: getUser[userIndex].device_token,
+          type: getUser[userIndex].device_type,
+          notificationType: globalConstants.matchNotificationTypeName,
+        });
+      }
     }
 
     let updateNotification = await user
@@ -428,14 +436,6 @@ exports.likeUser = async (req, res) => {
       .exec();
 
     if (updateNotification.n === 1) {
-      let getUser = (await user.find({ _id: id }).lean().exec()) || [];
-      deviceTokensAndType.push({
-        id: getUser[0]._id,
-        token: getUser[0].device_token,
-        type: getUser[0].device_type,
-        notificationType: globalConstants.matchNotificationTypeName,
-      });
-
       if (deviceTokensAndType.length > 0) {
         let { userMatchMessage, userMatchTitle } = notificationText.messages;
 
