@@ -441,7 +441,7 @@ exports.likeUser = async (req, res) => {
 
       if (deviceTokensAndType.length > 0) {
         let { userMatchMessage, userMatchTitle } = notificationText.messages;
-
+        
         await notificationService.setNotification(
           userMatchMessage,
           userMatchTitle,

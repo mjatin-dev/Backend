@@ -95,6 +95,7 @@ const like_user = (req, res, next) => {
 };
 
 const report_user = (req, res, next) => {
+  console.log(req);
   const validationRule = {
     reported_by_user_id: "required",
     reason: "required",
@@ -108,7 +109,7 @@ const report_user = (req, res, next) => {
         errors: err.errors,
       });
     } else {
-      next();
+     // next();
     }
   });
 };

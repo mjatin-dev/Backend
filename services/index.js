@@ -1,1 +1,1 @@
-exports.notificationService = require("./notification.service");
+export const { notificationService } = require("./notification.service");
