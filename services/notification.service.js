@@ -1,5 +1,5 @@
 const user = require("../models/user");
-const { notifications } = require("../utilities");
+const { notifications, globalConstants } = require("../utilities");
 
 /******* Notifications ***/
 let setNotification = async (deviceToken = [], title = "", message = "") => {
@@ -12,7 +12,7 @@ let setNotification = async (deviceToken = [], title = "", message = "") => {
       ) {
         if (
           deviceToken[deviceTokenIndex]["type"] ===
-          globalConstants.constant.typeAndroid
+          globalConstants.typeAndroid
         ) {
           sendNotification(message, title, deviceToken, deviceTokenIndex)
             .then((isSend) => {
