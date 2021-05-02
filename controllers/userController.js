@@ -124,8 +124,8 @@ exports.standardLogin = async (req, res) => {
       (await user.find({ email: email, type: "standard" }).lean().exec()) || [];
     if (getDetail.length > 0) {
       if (!getDetail || !bcrypt.compareSync(password, getDetail[0].password)) {
-        res.status(200).json({
-          status: 200,
+        res.status(400).json({
+          status: 400,
           message: "Invalid credentials!!",
         });
       } else {
@@ -401,7 +401,7 @@ exports.likeUser = async (req, res) => {
 
     console.log("user_id", checkIsAlreadyLikeUser);
 
-    if (checkIsAlreadyLikeUser > 0) {
+    if (checkIsAlreadyLikeUser.length > 0) {
       let getUser =
         (await user
           .find({ _id: mongoose.Types.ObjectId(member_id) })
