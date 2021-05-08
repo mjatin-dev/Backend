@@ -49,6 +49,12 @@ const userSchema = new mongoose.Schema({
       blocked_by_user_id: { type: mongoose.ObjectId, ref: "users" },
     },
   ],
+  matched_with: [
+    {
+      matched_on: { type: Date, default: Date.now() },
+      matched_user_id: { type: mongoose.ObjectId, ref: "users" },
+    },
+  ],
   images: { type: Array, default: [] },
   profile_image: { type: String, default: "" },
   type: { type: String, default: "standard" },
@@ -64,6 +70,7 @@ const userSchema = new mongoose.Schema({
   notification_on: { type: Number, default: 1 },
   notification_detail: [
     {
+      from: { type: mongoose.ObjectId, ref: "users" },
       notification_type: { type: String, default: "" },
       notification_title: { type: String, default: "" },
       notification_message: { type: String, default: "" },

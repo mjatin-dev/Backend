@@ -3,7 +3,12 @@ const mongoose = require("mongoose");
 const { notifications, globalConstants } = require("../utilities");
 
 /******* Notifications ***/
-let setNotification = async (message = "", title = "", deviceToken = []) => {
+let setNotification = async (
+  message = "",
+  title = "",
+  deviceToken = [],
+  from = ""
+) => {
   return new Promise((resolve, reject) => {
     try {
       for (
@@ -17,7 +22,13 @@ let setNotification = async (message = "", title = "", deviceToken = []) => {
           sendNotification(message, title, deviceToken, deviceTokenIndex)
             .then((isSend) => {
               console.log(isSend);
-              saveNotification(message, title, deviceToken, deviceTokenIndex)
+              saveNotification(
+                message,
+                title,
+                deviceToken,
+                deviceTokenIndex,
+                from
+              )
                 .then((isSave) => {
                   console.log(isSave);
                 })
@@ -57,11 +68,13 @@ let saveNotification = async (
   message,
   title,
   deviceToken,
-  deviceTokenIndex
+  deviceTokenIndex,
+  from
 ) => {
   return new Promise((resolve, reject) => {
     try {
       let updatePayload = {
+        from: mongoose.Types.ObjectId(from),
         notification_type: deviceToken[deviceTokenIndex]["notificationType"],
         notification_title: title,
         notification_message: message,

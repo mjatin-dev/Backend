@@ -352,7 +352,7 @@ exports.updateUser = async (req, res) => {
     }
 
     let updateUser = await user
-      .updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: update_payload })
+      .updateOne({ _id: mongoose.Types.ObjectId(id) }, { $set: updatePayload })
       .exec();
 
     if (updateUser.n === 1) {
@@ -381,7 +381,6 @@ exports.likeUser = async (req, res) => {
   try {
     let { id } = req.user;
     let { member_id } = req.body;
-    let deviceTokensAndType = [];
 
     let checkIsAlreadyLikeUser =
       (await user
@@ -401,24 +400,20 @@ exports.likeUser = async (req, res) => {
         .exec()) || [];
 
     if (checkIsAlreadyLikeUser.length > 0) {
-      let getUser =
-        (await user
-          .find({
-            $or: [
-              { _id: mongoose.Types.ObjectId(member_id) },
-              { _id: mongoose.Types.ObjectId(id) },
-            ],
-          })
-          .lean()
-          .exec()) || [];
+      let isFindUserAndSendNotificationForFirstUser = await findUserAndSendNotification(
+        member_id,
+        id
+      );
+      if (isFindUserAndSendNotificationForFirstUser) {
+        await setUserMatched(member_id, id);
+      }
 
-      for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
-        deviceTokensAndType.push({
-          id: getUser[userIndex]._id,
-          token: getUser[userIndex].device_token,
-          type: getUser[userIndex].device_type,
-          notificationType: globalConstants.matchNotificationTypeName,
-        });
+      let isFindUserAndSendNotificationForSecondUser = await findUserAndSendNotification(
+        id,
+        member_id
+      );
+      if (isFindUserAndSendNotificationForSecondUser) {
+        await setUserMatched(id, member_id);
       }
     }
 
@@ -436,16 +431,6 @@ exports.likeUser = async (req, res) => {
       .exec();
 
     if (updateNotification.n === 1) {
-      if (deviceTokensAndType.length > 0) {
-        let { userMatchMessage, userMatchTitle } = notificationText.messages;
-
-        await notificationService.setNotification(
-          userMatchMessage,
-          userMatchTitle,
-          deviceTokensAndType
-        );
-      }
-
       res.status(200).json({ status: 200, message: "Update successfully" });
     } else {
       res
@@ -752,6 +737,7 @@ exports.getNotifications = async (req, res) => {
             _id: 0,
           }
         )
+        .populate("notification_detail.from")
         .lean()
         .exec()) || [];
     if (listNotifications.length > 0) {
@@ -768,5 +754,58 @@ exports.getNotifications = async (req, res) => {
       status: 500,
       message: error.message || "Something went wrong",
     });
+  }
+};
+
+let findUserAndSendNotification = async (userId, fromUserId) => {
+  let deviceTokensAndType = [];
+  let getUser =
+    (await user
+      .find({ _id: mongoose.Types.ObjectId(userId) })
+      .lean()
+      .exec()) || [];
+
+  for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
+    deviceTokensAndType.push({
+      id: getUser[userIndex]._id,
+      token: getUser[userIndex].device_token,
+      type: getUser[userIndex].device_type,
+      notificationType: globalConstants.matchNotificationTypeName,
+    });
+  }
+
+  if (deviceTokensAndType.length > 0) {
+    let { userMatchMessage, userMatchTitle } = notificationText.messages;
+
+    await notificationService.setNotification(
+      userMatchMessage,
+      userMatchTitle,
+      deviceTokensAndType,
+      fromUserId
+    );
+  }
+};
+
+let setUserMatched = async (userId, matchedId) => {
+  try {
+    let updateUser = await user
+      .updateOne(
+        { _id: mongoose.Types.ObjectId(userId) },
+        {
+          $push: {
+            matched_with: {
+              matched_user_id: mongoose.Types.ObjectId(matchedId),
+            },
+          },
+        }
+      )
+      .exec();
+    if (updateUser.n === 1) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return error;
   }
 };
