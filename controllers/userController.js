@@ -764,6 +764,7 @@ let findUserAndSendNotification = async (userId, fromUserId) => {
       .find({ _id: mongoose.Types.ObjectId(userId) })
       .lean()
       .exec()) || [];
+      console.log(getUser.length);
 
   for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
     deviceTokensAndType.push({
