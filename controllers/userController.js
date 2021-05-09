@@ -735,6 +735,10 @@ exports.getNotifications = async (req, res) => {
           { _id: mongoose.Types.ObjectId(id) },
           {
             notification_detail: 1,
+            "notfication_detail.name":1,
+            "notfication_detail.email":1,
+            "notfication_detail.age":1,
+            "notfication_detail.images":1,
             _id: 0,
           }
         )
