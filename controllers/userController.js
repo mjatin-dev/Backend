@@ -58,6 +58,7 @@ exports.createStandardUser = async (req, res) => {
       your_status,
       device_type,
       device_token,
+      images,
     } = req.body;
 
     let getEmail = await user.find({ email });
@@ -80,6 +81,7 @@ exports.createStandardUser = async (req, res) => {
         device_type,
         device_token,
         type: "standard",
+        images,
       });
       let createUser = await newUserInstance.save();
 
