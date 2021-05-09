@@ -202,7 +202,7 @@ exports.socialSignup = async (req, res) => {
 
       if (createUser) {
         let checkuserExistsOrNot = await user
-          .find({ _id: create_user._id })
+          .find({ _id: createUser._id })
           .lean()
           .exec();
         let token = sigin(checkuserExistsOrNot[0]._id);
@@ -737,9 +737,7 @@ exports.getNotifications = async (req, res) => {
             _id: 0,
           }
         )
-        .populate("notification_detail.from")
-        .lean()
-        .exec()) || [];
+        .populate("notification_detail.from")) || [];
     if (listNotifications.length > 0) {
       res.status(200).json({
         status: 200,
@@ -764,7 +762,7 @@ let findUserAndSendNotification = async (userId, fromUserId) => {
       .find({ _id: mongoose.Types.ObjectId(userId) })
       .lean()
       .exec()) || [];
-      console.log(getUser.length);
+  console.log("lenght of users", getUser.length);
 
   for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
     deviceTokensAndType.push({
