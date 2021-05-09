@@ -735,14 +735,13 @@ exports.getNotifications = async (req, res) => {
           { _id: mongoose.Types.ObjectId(id) },
           {
             notification_detail: 1,
-            "notfication_detail.name":1,
-            "notfication_detail.email":1,
-            "notfication_detail.age":1,
-            "notfication_detail.images":1,
             _id: 0,
           }
         )
-        .populate("notification_detail.from")) || [];
+        .populate({
+          path: "notification_detail.from",
+          select: { name: 1, age: 1, images: 1 },
+        })) || [];
     if (listNotifications.length > 0) {
       res.status(200).json({
         status: 200,
