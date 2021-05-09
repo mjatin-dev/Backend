@@ -728,6 +728,7 @@ exports.getUserProfile = async (req, res) => {
 exports.getNotifications = async (req, res) => {
   try {
     let { id } = req.user;
+    console.log(id);
     let listNotifications =
       (await user
         .find(
