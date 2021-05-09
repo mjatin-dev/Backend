@@ -400,21 +400,11 @@ exports.likeUser = async (req, res) => {
         .exec()) || [];
 
     if (checkIsAlreadyLikeUser.length > 0) {
-      let isFindUserAndSendNotificationForFirstUser = await findUserAndSendNotification(
-        member_id,
-        id
-      );
-      if (isFindUserAndSendNotificationForFirstUser) {
-        await setUserMatched(member_id, id);
-      }
+      findUserAndSendNotification(member_id, id);
+      setUserMatched(member_id, id);
 
-      let isFindUserAndSendNotificationForSecondUser = await findUserAndSendNotification(
-        id,
-        member_id
-      );
-      if (isFindUserAndSendNotificationForSecondUser) {
-        await setUserMatched(id, member_id);
-      }
+      findUserAndSendNotification(id, member_id);
+      setUserMatched(id, member_id);
     }
 
     let updateNotification = await user
@@ -680,7 +670,11 @@ exports.userAnswers = async (req, res) => {
       res.status(200).json({
         status: 200,
         message: "Update successfully",
-        data: { love_type, love_value },
+        data: {
+          love_type,
+          love_value,
+          description: getTypes[0].type.description,
+        },
       });
     } else {
       res
@@ -756,6 +750,27 @@ exports.getNotifications = async (req, res) => {
       status: 500,
       message: error.message || "Something went wrong",
     });
+  }
+};
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+exports.deleteUserAccount = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const deleteUser = user.remove({ _id: mongoose.Types.ObjectId(id) });
+    if (deleteUser) {
+      res.status(200).json({ status: 200, message: "User has been removed." });
+    } else {
+      res.status(500).json({ status: 500, message: "Something went wrong" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: 500, message: error.message || "Something went wrong" });
   }
 };
 

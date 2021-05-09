@@ -27,5 +27,6 @@ router.get("/user_list", verify, user.userList);
 router.post("/user_answers", verify, user.userAnswers);
 router.get("/user_detail", verify, validate.user_detail, user.getUserProfile);
 router.get("/user_notification", verify, user.getNotifications);
+router.delete("/delete_account", verify, user.deleteUserAccount);
 
 module.exports = router;

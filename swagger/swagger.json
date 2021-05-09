@@ -416,6 +416,25 @@
           }
         }
       }
+    },
+    "/delete_account": {
+      "delete": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Accout has been removed"
+          }
+        }
+      }
     }
   },
   "definitions": {
