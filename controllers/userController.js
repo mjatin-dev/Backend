@@ -171,6 +171,7 @@ exports.socialSignup = async (req, res) => {
       device_type,
       device_token,
       social_id,
+      images,
     } = req.body;
     let checkuserExistsOrNot = await user
       .find({ social_id: social_id })
@@ -197,6 +198,7 @@ exports.socialSignup = async (req, res) => {
         device_token,
         social_id,
         type: "social",
+        images,
       });
       let createUser = await newUserInstance.save();
 
