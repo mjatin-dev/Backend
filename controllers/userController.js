@@ -655,8 +655,6 @@ exports.userList = async (req, res) => {
       ],
     };
 
-    
-
     let userList = (await user.find(queryCondition).sort({ _id: 1 })) || [];
     if (userList.length > 0) {
       res
@@ -842,6 +840,12 @@ exports.deleteUserAccount = async (req, res) => {
   }
 };
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+
 exports.chatNotification = async (req, res) => {
   try {
     const { _id } = req.user;
@@ -862,6 +866,44 @@ exports.chatNotification = async (req, res) => {
       res
         .status(200)
         .json({ status: 200, message: "Notification has been saved" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: 500, message: error.message || "Something went wrong" });
+  }
+};
+
+exports.unMatchUser = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { member_id } = req.body;
+    const removeLikeUser = await user.updateOne(
+      { _id: mongoose.Types.ObjectId(_id) },
+      {
+        $pull: {
+          "liked_members.liked_user_id": {
+            liked_user_id: mongoose.Types.ObjectId(member_id),
+          },
+        },
+      }
+    );
+
+    const removeMatchedUser = await user.updateOne(
+      { _id: mongoose.Types.ObjectId(_id) },
+      {
+        $pull: {
+          "matched_with.matched_user_id": {
+            matched_user_id: mongoose.Types.ObjectId(member_id),
+          },
+        },
+      }
+    );
+
+    if (removeLikeUser.n === 1 && removeMatchedUser === 1) {
+      res.status(200).json({ status: 200, message: "User has been removed." });
+    } else {
+      res.status(500).json({ status: 500, message: "Something went wrong" });
     }
   } catch (error) {
     res
