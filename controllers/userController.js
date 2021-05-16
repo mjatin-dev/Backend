@@ -632,7 +632,7 @@ exports.userList = async (req, res) => {
         { love_type: love_type },
         { age: { $gte: age.min } },
         { age: { $lte: age.max } },
-        { insterted_In },
+        { intrestedIn },
         { _id: { $nin: liked_members } },
         { _id: { $ne: mongoose.Types.ObjectId(id) } },
         { _id: { $nin: disliked_members } },
