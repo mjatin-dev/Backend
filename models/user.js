@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     min: { type: Number },
     max: { type: Number },
   },
-  insterted_in: {
+  interest_in: {
     type: String,
     enum: ["Men", "Women", "Both", "None"],
     default: "None",

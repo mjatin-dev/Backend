@@ -9,8 +9,8 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "host": "3.142.32.45:8000",
-  "host1": "localhost:8000",
+  "hos1": "3.142.32.45:8000",
+  "host": "localhost:8000",
   "basePath": "/api/v1",
   "tags": [
     {
@@ -334,7 +334,7 @@
       }
     },
     "/user_list": {
-      "get": {
+      "post": {
         "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
         "parameters": [
           {
@@ -342,6 +342,13 @@
             "in": "header",
             "required": true,
             "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/user_list"
+            }
           }
         ],
         "produces": ["application/json"],
@@ -426,6 +433,32 @@
             "in": "header",
             "required": true,
             "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Accout has been removed"
+          }
+        }
+      }
+    },
+    "/chat_notification": {
+      "post": {
+        "description": "In this send authorization token follow with Bearer i.e (Bearer token)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "description": "In this send authorization token follow with Bearer i.e (Bearer token)"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/chat_notification"
+            }
           }
         ],
         "produces": ["application/json"],
@@ -588,7 +621,7 @@
             }
           }
         },
-        "insterted_in": {
+        "interest_in": {
           "type": "string"
         },
         "radius_range": {
@@ -638,6 +671,17 @@
         }
       }
     },
+    "user_list": {
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "number"
+        },
+        "longitude:": {
+          "type": "number"
+        }
+      }
+    },
     "user_answers": {
       "required": ["answer_list"],
       "properties": {
@@ -650,6 +694,17 @@
       "required": ["user_id"],
       "properties": {
         "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "chat_notification": {
+      "required": ["user_id", "message"],
+      "properties": {
+        "user_id": {
+          "type": "string"
+        },
+        "message": {
           "type": "string"
         }
       }

@@ -330,7 +330,7 @@ exports.updateUser = async (req, res) => {
     let { id } = req.user;
     let {
       age_range,
-      insterted_in,
+      interest_in,
       radius_range,
       step,
       name,
@@ -339,12 +339,12 @@ exports.updateUser = async (req, res) => {
       about_me,
     } = req.body;
     let updatePayload = {};
-    if (step == 1) {
+    if (step === 1) {
       updatePayload = {
         age_range: age_range
           ? { min: age_range.min, max: age_range.max }
           : { min: 0, max: 0 },
-        insterted_in: insterted_in || "None",
+        interest_in: interest_in || "None",
         radius_range: radius_range
           ? { min: radius_range.min, max: radius_range.max }
           : { min: 0, max: 0 },
@@ -404,10 +404,16 @@ exports.likeUser = async (req, res) => {
         .exec()) || [];
 
     if (checkIsAlreadyLikeUser.length > 0) {
-      findUserAndSendNotification(member_id, id);
+      const notificationPayload = ({
+        userMatchTitle: title,
+        userMatchMessage: message,
+        userMatchType: type,
+      } = notificationText.messages);
+
+      findUserAndSendNotification(member_id, id, notificationPayload);
       setUserMatched(member_id, id);
 
-      findUserAndSendNotification(id, member_id);
+      findUserAndSendNotification(id, member_id, notificationPayload);
       setUserMatched(id, member_id);
     }
 
@@ -576,12 +582,20 @@ exports.getQuestions = async (req, res) => {
 exports.userList = async (req, res) => {
   try {
     let { id } = req.user;
+    let { latitude, longitude } = req.body;
     let userDetail = await user
       .findOne({ _id: mongoose.Types.ObjectId(id) })
       .lean()
       .exec();
 
-    let { liked_members, disliked_members } = userDetail;
+    let {
+      liked_members,
+      disliked_members,
+      age,
+      radius_range,
+      love_type,
+      interest_in,
+    } = userDetail;
     liked_members = liked_members
       ? liked_members.map((data) => data.liked_user_id)
       : [];
@@ -589,14 +603,41 @@ exports.userList = async (req, res) => {
       ? disliked_members.map((data) => data.disliked_user_id)
       : [];
 
-    let condition = {
+    let intrestedIn;
+    if (interest_in === "Both") {
+      intrestedIn = {
+        interest_in: {
+          $or: [{ interest_in: "Men" }, { interest_in: "Women" }],
+        },
+      };
+    } else {
+      intrestedIn = { interest_in: insterted_in };
+    }
+
+    const condition = {
       $and: [
+        {
+          location: {
+            $near: {
+              $minDistance: parseInt(radius_range.min) * 1000,
+              $maxDistance: parseInt(radius_range.max) * 1000,
+              $geometry: {
+                type: "Point",
+                coordinates: [longitude, latitude],
+              },
+            },
+          },
+        },
+        { love_type: love_type },
+        { age: { $gte: age.min } },
+        { age: { $lte: age.max } },
+        { insterted_In },
         { _id: { $nin: liked_members } },
         { _id: { $ne: mongoose.Types.ObjectId(id) } },
         { _id: { $nin: disliked_members } },
       ],
     };
-    let userList = (await user.find(condition)) || [];
+    let userList = (await user.find(condition).sort({ _id: 1 })) || [];
     if (userList.length > 0) {
       res
         .status(200)
@@ -778,30 +819,60 @@ exports.deleteUserAccount = async (req, res) => {
   }
 };
 
-let findUserAndSendNotification = async (userId, fromUserId) => {
+exports.chatNotification = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { user_id, message } = req.body;
+
+    let notificationPayload = ({
+      userNotificationTitle: title,
+      userNotificiationType: type,
+    } = notificationText.messages);
+
+    notificationPayload.message = message;
+    let saveAndSendNotification = await findUserAndSendNotification(
+      _id,
+      user_id,
+      notificationPayload
+    );
+    if (saveAndSendNotification) {
+      res
+        .status(200)
+        .json({ status: 200, message: "Notification has been saved" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: 500, message: error.message || "Something went wrong" });
+  }
+};
+
+let findUserAndSendNotification = async (
+  userId,
+  fromUserId,
+  messagePayload
+) => {
+  let { title, message, type } = messagePayload;
   let deviceTokensAndType = [];
   let getUser =
     (await user
       .find({ _id: mongoose.Types.ObjectId(userId) })
       .lean()
       .exec()) || [];
-  console.log("lenght of users", getUser.length);
 
   for (let userIndex = 0; userIndex < getUser.length; userIndex++) {
     deviceTokensAndType.push({
       id: getUser[userIndex]._id,
       token: getUser[userIndex].device_token,
       type: getUser[userIndex].device_type,
-      notificationType: globalConstants.matchNotificationTypeName,
+      notificationType: type,
     });
   }
 
   if (deviceTokensAndType.length > 0) {
-    let { userMatchMessage, userMatchTitle } = notificationText.messages;
-
     await notificationService.setNotification(
-      userMatchMessage,
-      userMatchTitle,
+      message,
+      title,
       deviceTokensAndType,
       fromUserId
     );

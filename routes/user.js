@@ -23,10 +23,11 @@ router.post("/dislike_user", verify, validate.like_user, user.dislikeUser);
 router.post("/block_user", verify, validate.like_user, user.blockUser);
 router.post("/report_user", verify, validate.report_user, user.reportUser);
 router.get("/get_questions", verify, user.getQuestions);
-router.get("/user_list", verify, user.userList);
+router.post("/user_list", verify, user.userList);
 router.post("/user_answers", verify, user.userAnswers);
 router.get("/user_detail", verify, validate.user_detail, user.getUserProfile);
 router.get("/user_notification", verify, user.getNotifications);
 router.delete("/delete_account", verify, user.deleteUserAccount);
+router.post("/chat_notification", verify, user.chatNotification);
 
 module.exports = router;
