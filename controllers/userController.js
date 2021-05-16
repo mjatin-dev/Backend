@@ -707,7 +707,9 @@ exports.userAnswers = async (req, res) => {
           $set: { love_type: generatedCode, love_value: getUserType[0].value },
         }
       )
-      .exec();
+      .exec(); 
+
+     const description = getUserType[0].description;
     if (updateLoveType.n === 1) {
       let { love_type, love_value } =
         (await user.findOne({ _id: id }).lean().exec()) || [];
@@ -718,7 +720,7 @@ exports.userAnswers = async (req, res) => {
         data: {
           love_type,
           love_value,
-          description: getTypes[0].type.description,
+          description,
         },
       });
     } else {
