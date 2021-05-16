@@ -595,6 +595,7 @@ exports.userList = async (req, res) => {
       radius_range,
       love_type,
       interest_in,
+      location
     } = userDetail;
     liked_members = liked_members
       ? liked_members.map((data) => data.liked_user_id)
@@ -623,7 +624,7 @@ exports.userList = async (req, res) => {
               $maxDistance: parseInt(radius_range.max) * 1000,
               $geometry: {
                 type: "Point",
-                coordinates: [longitude, latitude],
+                coordinates: [location.coordinates[1], location.coordinates[0]],
               },
             },
           },
