@@ -9,8 +9,8 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "hos1": "3.142.32.45:8000",
-  "host": "localhost:8000",
+  "hos": "3.142.32.45:8000",
+  "host1": "localhost:8000",
   "basePath": "/api/v1",
   "tags": [
     {
