@@ -582,7 +582,7 @@ exports.getQuestions = async (req, res) => {
 exports.userList = async (req, res) => {
   try {
     let { id } = req.user;
-    let { latitude, longitude } = req.body;
+    let condition = [];
     let userDetail = await user
       .findOne({ _id: mongoose.Types.ObjectId(id) })
       .lean()
@@ -591,12 +591,13 @@ exports.userList = async (req, res) => {
     let {
       liked_members,
       disliked_members,
-      age,
+      age_range,
       radius_range,
       love_type,
       interest_in,
-      location
+      location,
     } = userDetail;
+
     liked_members = liked_members
       ? liked_members.map((data) => data.liked_user_id)
       : [];
@@ -604,41 +605,59 @@ exports.userList = async (req, res) => {
       ? disliked_members.map((data) => data.disliked_user_id)
       : [];
 
-    let intrestedIn;
-    if (interest_in === "Both") {
-      intrestedIn = {
-        interest_in: {
-          $or: [{ interest_in: "Men" }, { interest_in: "Women" }],
-        },
-      };
-    } else {
-      intrestedIn = { interest_in: insterted_in };
+    if (interest_in && typeof interest_in === undefined) {
+      let intrestedIn;
+      if (interest_in === "Both") {
+        intrestedIn = {
+          interest_in: {
+            $or: [{ interest_in: "Men" }, { interest_in: "Women" }],
+          },
+        };
+      } else {
+        intrestedIn = { interest_in: interest_in };
+      }
+      condition.push(intrestedIn);
     }
 
-    const condition = {
-      $and: [
-        {
-          location: {
-            $near: {
-              $minDistance: parseInt(radius_range.min) * 1000,
-              $maxDistance: parseInt(radius_range.max) * 1000,
-              $geometry: {
-                type: "Point",
-                coordinates: [location.coordinates[1], location.coordinates[0]],
-              },
+    if (age_range && age_range.min && age_range.max) {
+      const ageRange = {
+        $or: [
+          { age: { $lte: age_range.max } },
+          { age: { $gte: age_range.min } },
+        ],
+      };
+      condition.push(ageRange);
+    }
+
+    if (location && location.coordinates.length > 0 && radius_range) {
+      const location = {
+        location: {
+          $near: {
+            $minDistance: parseInt(radius_range.min) * 1000,
+            $maxDistance: parseInt(radius_range.max) * 1000,
+            $geometry: {
+              type: "Point",
+              coordinates: [location.coordinates[1], location.coordinates[0]],
             },
           },
         },
+      };
+      condition.push(location);
+    }
+
+    const queryCondition = {
+      $and: [
         { love_type: love_type },
-        { age: { $gte: age.min } },
-        { age: { $lte: age.max } },
-        { intrestedIn },
         { _id: { $nin: liked_members } },
         { _id: { $ne: mongoose.Types.ObjectId(id) } },
         { _id: { $nin: disliked_members } },
+        ...condition,
       ],
     };
-    let userList = (await user.find(condition).sort({ _id: 1 })) || [];
+
+    
+
+    let userList = (await user.find(queryCondition).sort({ _id: 1 })) || [];
     if (userList.length > 0) {
       res
         .status(200)
@@ -649,6 +668,7 @@ exports.userList = async (req, res) => {
         .json({ status: 201, message: "Users List", data: userList });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: 500,
       message: error.message || "Internal server error!!",
@@ -708,9 +728,9 @@ exports.userAnswers = async (req, res) => {
           $set: { love_type: generatedCode, love_value: getUserType[0].value },
         }
       )
-      .exec(); 
+      .exec();
 
-     const description = getUserType[0].description;
+    const description = getUserType[0].description;
     if (updateLoveType.n === 1) {
       let { love_type, love_value } =
         (await user.findOne({ _id: id }).lean().exec()) || [];
