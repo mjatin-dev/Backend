@@ -7,7 +7,8 @@ let setNotification = async (
   message = "",
   title = "",
   deviceToken = [],
-  from = ""
+  from = "",
+  notificationPayload
 ) => {
   return new Promise((resolve, reject) => {
     try {
@@ -19,15 +20,21 @@ let setNotification = async (
         if (
           deviceToken[deviceTokenIndex]["type"] === globalConstants.typeAndroid
         ) {
-          sendNotification(message, title, deviceToken, deviceTokenIndex)
+          sendNotification(
+            message,
+            title,
+            deviceToken,
+            deviceTokenIndex,
+            notificationPayload
+          )
             .then((isSend) => {
-              console.log(isSend);
               saveNotification(
                 message,
                 title,
                 deviceToken,
                 deviceTokenIndex,
-                from
+                from,
+                notificationPayload
               )
                 .then((isSave) => {
                   console.log(isSave);
@@ -48,11 +55,13 @@ let sendNotification = async (
   message,
   title,
   deviceToken,
-  deviceTokenIndex
+  deviceTokenIndex,
+  notificationPayload
 ) => {
   try {
     let body = {
       type: deviceToken[deviceTokenIndex]["type"],
+      data: notificationPayload,
     };
     await notifications.sendAndroid(
       body,
