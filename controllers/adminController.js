@@ -1,7 +1,9 @@
-const { admin, question, user, typeModel } = require("../models/");
+const { admin, question, user, typeModel, giftModel } = require("../models/");
 const { sigin } = require("../auth/");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const gift = require("../models/gift");
+const { create } = require("../models/gift");
 
 /**
  *
@@ -134,14 +136,13 @@ exports.addquestion = async (req, res) => {
   }
 };
 
-exports.addType = async(req,res)=>{
-	try {
+exports.addType = async (req, res) => {
+  try {
     let { code, value } = req.body;
-   // let { id } = req.user;
-    let id = '608583764ca3b63df7c19780';
-  
+    // let { id } = req.user;
+    let id = "608583764ca3b63df7c19780";
 
-      let type = {
+    let type = {
       code,
       value,
     };
@@ -149,7 +150,7 @@ exports.addType = async(req,res)=>{
       { _id: mongoose.Types.ObjectId(id) },
       { $push: { type } }
     );
-   
+
     if (update.n === 1) {
       res
         .status(200)
@@ -165,7 +166,7 @@ exports.addType = async(req,res)=>{
       message: error.message || "Interal server error!",
     });
   }
-}
+};
 
 /**
  * @param {} req
@@ -215,5 +216,110 @@ exports.getQuestion = async (req, res) => {
     res
       .status(500)
       .json({ status: 500, message: error.message || "Internal server error" });
+  }
+};
+
+exports.addGift = async (req, res) => {
+  try {
+    const { name } = req.body;
+    let new_gift = new giftModel({
+      name: name,
+      images: req.file.filename,
+    });
+    let create_gift = await new_gift.save();
+    if (create_gift) {
+      res.status(200).json({
+        status: 200,
+        message: "Gift has been created!",
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: "Internal server error!",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Internal server error!",
+    });
+  }
+};
+
+exports.giftList = async (req, res) => {
+  try {
+    const giftList = await giftModel.find({});
+    if (giftList.length > 0) {
+      res.status(200).json({
+        status: 200,
+        data: giftList,
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: "Internal server error!",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Internal server error!",
+    });
+  }
+};
+
+exports.getGift = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const giftDetail = await giftModel.findOne({
+      _id: mongoose.Types.ObjectId(id),
+    });
+    if (giftDetail) {
+      res.status(200).json({
+        status: 200,
+        data: giftDetail,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Internal server error!",
+    });
+  }
+};
+
+exports.updateGift = async (req, res) => {
+  try {
+    let obj = {};
+    const { name, id, image } = req.body;
+   
+    if (name) obj.name = name;
+    if (req.file) obj.images = req.file.filename;
+    else obj.images = image;
+
+    console.log(obj);
+
+    let updateGift = await giftModel.updateOne(
+      {
+        _id: mongoose.Types.ObjectId(id),
+      },
+      { $set: obj }
+    );
+    if (updateGift.n === 1) {
+      res.status(200).json({
+        status: 200,
+        message: "Gift has been created!",
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: "Internal server error!",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Internal server error!",
+    });
   }
 };

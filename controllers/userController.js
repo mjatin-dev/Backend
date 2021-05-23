@@ -1,4 +1,4 @@
-const { user, typeModel } = require("../models/");
+const { user, typeModel, giftModel } = require("../models/");
 const { sigin } = require("../auth/");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
@@ -909,6 +909,62 @@ exports.unMatchUser = async (req, res) => {
     res
       .status(500)
       .json({ status: 500, message: error.message || "Something went wrong" });
+  }
+};
+
+exports.getMatchedUser = async (req, res) => {
+  try {
+    let { id } = req.user;
+    let matchedUser =
+      (await user
+        .find(
+          { _id: mongoose.Types.ObjectId(id) },
+          {
+            matched_with: 1,
+            _id: 0,
+          }
+        )
+        .populate({
+          path: "matched_with.matched_user_id",
+          select: { name: 1, age: 1, images: 1 },
+        })) || [];
+    if (matchedUser.length > 0) {
+      res.status(200).json({
+        status: 200,
+        message: "matchedUser List",
+        data: matchedUser,
+      });
+    } else {
+      res.status(201).json({ status: 201, message: "No list found", data: [] });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Something went wrong",
+    });
+  }
+};
+
+exports.getGifts = async (req, res) => {
+  try {
+    const giftList = await giftModel.find({});
+    if (giftList.length > 0) {
+      res.status(200).json({
+        status: 200,
+        message: "Gifts list",
+        data: giftList,
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: "Something went wrong",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error.message || "Something went wrong",
+    });
   }
 };
 

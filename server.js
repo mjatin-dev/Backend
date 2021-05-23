@@ -16,6 +16,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use("/", express.static(`${__dirname}/build`));
+app.use("/images", express.static(`${__dirname}/uploads`));
 
 app.use(function (req, res, next) {
   console.log(req.method, req.path, "-", req.ip);

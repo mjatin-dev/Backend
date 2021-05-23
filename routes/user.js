@@ -29,5 +29,7 @@ router.get("/user_detail", verify, validate.user_detail, user.getUserProfile);
 router.get("/user_notification", verify, user.getNotifications);
 router.delete("/delete_account", verify, user.deleteUserAccount);
 router.post("/chat_notification", verify, user.chatNotification);
+router.get("/matched_user", verify, user.getMatchedUser);
+router.get("/gift_list", verify, user.getGifts);
 
 module.exports = router;
