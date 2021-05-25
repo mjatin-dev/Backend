@@ -928,10 +928,11 @@ exports.getMatchedUser = async (req, res) => {
           path: "matched_with.matched_user_id",
           select: { name: 1, age: 1, images: 1 },
         })) || [];
-    if (matchedUser.length > 0) {
+    console.log(matchedUser);
+    if (matchedUser && matchedUser[0].matched_with.length > 0) {
       res.status(200).json({
         status: 200,
-        message: "matchedUser List",
+        message: "matched User List",
         data: matchedUser,
       });
     } else {
@@ -947,7 +948,7 @@ exports.getMatchedUser = async (req, res) => {
 
 exports.getGifts = async (req, res) => {
   try {
-    const giftList = await giftModel.find({});
+    const giftList = (await giftModel.find({})) || [];
     if (giftList.length > 0) {
       res.status(200).json({
         status: 200,
@@ -955,9 +956,10 @@ exports.getGifts = async (req, res) => {
         data: giftList,
       });
     } else {
-      res.status(500).json({
-        status: 500,
-        message: "Something went wrong",
+      res.status(201).json({
+        status: 201,
+        message: "No gifts found",
+        data: giftList,
       });
     }
   } catch (error) {
